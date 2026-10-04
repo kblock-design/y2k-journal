@@ -1,0 +1,602 @@
+/*
+ * GLOSS — colourways. Silver (the default, hot pink) is the :root token set in gloss.css; each
+ * block here overrides tokens only, on <html data-gl-colour="…"> (Settings › Appearance ›
+ * Colour). Tokens not listed keep their Silver value. Colour only: nothing here changes layout.
+ *
+ * Five personalities: Silver (silver + hot pink), Onyx (black + electric lime), Cobalt (electric
+ * blue + white), Cherry (crimson lacquer), Gold (gold + espresso + burgundy). Onyx, Cobalt and
+ * Gold carry no pink at all: accent, gels, glint, stamp, sticky note and phase colours included.
+ *
+ * On the saturated pages, text straight on the page uses --page-ink (white on Cobalt and Cherry,
+ * espresso on Gold); text on glass, sheets and chips keeps --card-ink (see the scope rule in
+ * gloss.css). All contrast is computed on the composited colours (glass over the page).
+ */
+
+/* ---------- Onyx: black and graphite, smoked glass, pearl gel, electric lime ---------- */
+
+:root[data-gl-colour='onyx'] {
+  color-scheme: dark;
+
+  --bg: #0e0e11;
+  --page-glows:
+    radial-gradient(80% 42% at 100% 0%, rgba(198, 248, 30, 0.12) 0%, rgba(198, 248, 30, 0) 70%),
+    radial-gradient(70% 36% at 0% 22%, rgba(90, 120, 220, 0.14) 0%, rgba(90, 120, 220, 0) 70%);
+  --sphere: radial-gradient(circle at 34% 30%, #f4ffd0 0%, #c6f81e 30%, #4f8a00 72%, #1f3a00 100%);
+  --sphere-opacity: 0.32;
+
+  --surface: #1c1c21;
+  --surface-2: #26262c;
+  --surface-3: #37373f;
+  --card-ink: #f2f1f5;
+  --card-ink-2: #aeacb8;
+  --on-ink: #17161b;
+  --edge-rgb: 255, 255, 255;
+  --shade-rgb: 0, 0, 0;
+  --hi: rgba(255, 255, 255, 0.1);
+  --hi-soft: rgba(255, 255, 255, 0.14);
+  --hairline: linear-gradient(180deg, rgba(0, 0, 0, 0.55) 50%, rgba(255, 255, 255, 0.12) 50%);
+
+  --card-solid: rgba(30, 30, 36, 0.94);
+  --card-border: rgba(255, 255, 255, 0.07);
+  --card-glass: linear-gradient(180deg, rgba(40, 40, 47, 0.82) 0%, rgba(26, 26, 31, 0.72) 100%);
+  --dock-solid: rgba(28, 28, 33, 0.96);
+  --dock-glass: linear-gradient(180deg, rgba(44, 44, 52, 0.86) 0%, rgba(24, 24, 29, 0.82) 100%);
+  --bar-solid: rgba(30, 30, 36, 0.97);
+  --bar-glass: linear-gradient(180deg, rgba(44, 44, 52, 0.9), rgba(28, 28, 33, 0.88));
+  --pill-solid: rgba(30, 30, 36, 0.94);
+  --pill-glass: rgba(30, 30, 36, 0.68);
+  --pill-border: rgba(255, 255, 255, 0.08);
+  --datepill: rgba(255, 255, 255, 0.07);
+  --sheet-bg: linear-gradient(180deg, #1f1f24 0%, #151518 120px, #151518 100%);
+  --sheet-foot: #151518;
+  --sheet-foot-glass: rgba(21, 21, 24, 0.84);
+  --dialog-bg: linear-gradient(180deg, #26262c 0%, #1c1c21 100%);
+  --seg-track: #131316;
+  --switch-track: #2a2a31;
+  --day-empty: rgba(255, 255, 255, 0.05);
+  --tile-hi: rgba(255, 255, 255, 0.12);
+
+  --hot: #c6f81e;
+  --hot-rgb: 198, 248, 30;
+  --hot-deep: #c8ff4d;
+  --hot-deep-rgb: 200, 255, 77;
+  --hot-tint: #262f10;
+  --hot-tint-rgb: 38, 47, 16;
+  --drop: #ffc4b3; /* ≥ 3:1 on every jewel-tone tile */
+  --hot-gel-1: #efffb0;
+  --hot-gel-2: #c6f81e;
+  --hot-gel-3: #86b800;
+  --hot-light: #dcff6a;
+  --hot-dark: #6e9800;
+  --hot-bar: #4d6a12;
+  --hot-rim-rgb: 60, 80, 0;
+  --hot-glow-rgb: 150, 210, 0;
+  --hot-inner: rgba(240, 255, 190, 0.45);
+  --on-hot: #10120a;
+
+  /* Pearl gel: the primary pill turns white on black. */
+  --gel: linear-gradient(180deg, #ffffff 0%, #ebebf0 46%, #d2d3db 54%, #e6e7ed 100%);
+  --gel-nav: linear-gradient(180deg, #ffffff 0%, #e9e9ee 50%, #d2d3db 52%, #e6e7ed 100%);
+  --gel-ring: #6e6e78;
+  --gel-disabled: #8e8d97;
+  --gel-disabled-ring: #77767f;
+  --on-gel: #17161b;
+  --on-gel-2: #4a4952;
+
+  /* Jewel-tone phases (brick, sapphire, ochre, emerald): light ink on every solid and tint. */
+  --pink: #a8392f;
+  --pink-tint: #55201b;
+  --pink-deep: #ffa48a;
+  --sky: #3c63a8;
+  --sky-tint: #213456;
+  --sky-deep: #a5c3f5;
+  --butter: #85690f;
+  --butter-tint: #4a3d16;
+  --butter-deep: #ecd06e;
+  --mint: #237559;
+  --mint-tint: #1b4636;
+  --mint-deep: #8ad8bb;
+  --banner-ring: rgba(236, 208, 110, 0.28);
+
+  --chrome: linear-gradient(180deg, #4c4c56 0%, #34343c 44%, #27272e 56%, #2f2f37 84%, #42424b 100%);
+  --orb-done: radial-gradient(120% 95% at 50% 0%, #6a6a75 0%, #3a3a43 55%, #24242a 100%);
+  --orb-halo: rgba(14, 14, 17, 0.95);
+  --holo: linear-gradient(112deg, #34500f 0%, #1f3d4f 24%, #2a2f66 46%, #1f4c3e 66%, #574820 84%, #34500f 100%);
+  --holo-rim: rgba(255, 255, 255, 0.18);
+  --wordmark-fill: linear-gradient(180deg, #8e919c 0%, #ffffff 30%, #c8cbd4 47%, #5b5e69 53%, #9a9da9 70%, #e6e8ee 86%, #a3a6b1 100%);
+  --wordmark-ink: #d6d6dc;
+  --wordmark-stroke: rgba(0, 0, 0, 0.5);
+  --wordmark-shadow: rgba(0, 0, 0, 0.8);
+
+  /* A CD on black: dark plate, coloured light-catch. */
+  --disc-plate:
+    radial-gradient(circle, rgba(255, 255, 255, 0) 0 54%, rgba(255, 255, 255, 0.07) 56%, rgba(255, 255, 255, 0) 74%, rgba(255, 255, 255, 0.1) 99%),
+    conic-gradient(
+      from 18deg,
+      #1d1d22 0deg,
+      #34480f 24deg,
+      #202026 48deg,
+      #1d1d22 92deg,
+      #23365a 118deg,
+      #1f4639 142deg,
+      #202026 168deg,
+      #1d1d22 200deg,
+      #4a3f1c 224deg,
+      #34480f 246deg,
+      #202026 272deg,
+      #1d1d22 300deg,
+      #2b2f5c 326deg,
+      #1d1d22 360deg
+    );
+  --groove-light: rgba(255, 255, 255, 0.1);
+  --groove-dark: rgba(0, 0, 0, 0.35);
+  --hub-1: #4a4a54;
+  --hub-2: #2c2c33;
+  --hub-3: #1f1f25;
+  --hub-ring: rgba(255, 255, 255, 0.18);
+  --rim-1: #c9cad3;
+  --rim-2: #6a6b76;
+  --rim-3: #2a2a31;
+  --rim-4: #7d7e89;
+  --bead-halo: #f2f1f5;
+
+  /* Backlit LCDs: lime segments glowing on black glass. */
+  --lcd-face: linear-gradient(180deg, #101215 0%, #171a1e 100%);
+  --lcd-ink: #c8ff4d;
+  --lcd-ink-2: #a9d65a;
+  --lcd-ghost: rgba(200, 255, 77, 0.07);
+  --lcd-glow: 0 0 6px rgba(170, 240, 0, 0.5);
+  --lcd-recess: rgba(0, 0, 0, 0.6);
+  --lcd-lip: rgba(255, 255, 255, 0.06);
+  --lcd-bezel: #2a2a31;
+  --lcd-bezel-rim: #4c4c56;
+  --lcd-glare: rgba(255, 255, 255, 0.05);
+
+  --sticky: linear-gradient(180deg, #2c2e28 0%, #24261f 100%);
+  --tape: linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(220, 220, 230, 0.12));
+  --tape-rim: rgba(255, 255, 255, 0.12);
+  --stamp: #c8ff4d;
+
+  --heat-lo: #26262c;
+  --heat-hi: #4f6b14;
+  --bar-mint-1: #1d4436;
+  --bar-mint-2: #4fb58f;
+  --history-1: #24344f;
+  --history-2: #5a82c8;
+  --lv-0: #3a3a43;
+  --lv-1: #7d7f8c;
+  --lv-2: #dddce4;
+  --db-link: rgba(198, 248, 30, 0.45);
+}
+
+/* ---------- Cobalt: electric-blue page, icy glass, steel chrome, white gel, cobalt accent ----------
+ * White text on the page; white on the page's own pops (glint, focus). Acid-yellow sticky note. */
+
+:root[data-gl-colour='cobalt'] {
+  --bg: #1640d6;
+  --page-glows:
+    radial-gradient(80% 42% at 100% 0%, rgba(70, 150, 255, 0.4) 0%, rgba(70, 150, 255, 0) 70%),
+    radial-gradient(70% 36% at 0% 22%, rgba(110, 40, 230, 0.45) 0%, rgba(110, 40, 230, 0) 70%);
+  --sphere: radial-gradient(circle at 34% 30%, #ffffff 0%, #c9f2ff 26%, #5fd0ff 62%, #2a7bff 100%);
+  --sphere-opacity: 0.45;
+
+  --surface-2: #eef3fd;
+  --surface-3: #d9e2f5;
+  --card-ink: #0b1a45;
+  --card-ink-2: #3a4a78;
+  --page-ink: #ffffff;
+  --page-ink-2: #eaf0ff;
+  --edge-rgb: 11, 26, 69;
+  --shade-rgb: 6, 16, 60;
+
+  --card-solid: rgba(240, 245, 255, 0.95);
+  --card-border: rgba(255, 255, 255, 0.7);
+  --card-glass: linear-gradient(180deg, rgba(246, 249, 255, 0.93) 0%, rgba(232, 240, 255, 0.86) 100%);
+  --dock-solid: rgba(238, 244, 255, 0.96);
+  --dock-glass: linear-gradient(180deg, rgba(246, 249, 255, 0.9) 0%, rgba(226, 235, 255, 0.86) 100%);
+  --bar-solid: rgba(242, 246, 255, 0.97);
+  --bar-glass: linear-gradient(180deg, rgba(248, 250, 255, 0.93), rgba(234, 241, 255, 0.9));
+  --pill-solid: rgba(240, 245, 255, 0.95);
+  --pill-glass: rgba(236, 242, 255, 0.8);
+  --pill-border: rgba(255, 255, 255, 0.7);
+  --datepill: rgba(240, 245, 255, 0.88);
+  --sheet-bg: linear-gradient(180deg, #f7f9ff 0%, #e9effb 120px, #e9effb 100%);
+  --sheet-foot: #e9effb;
+  --sheet-foot-glass: rgba(233, 239, 251, 0.86);
+  --dialog-bg: linear-gradient(180deg, #ffffff 0%, #eef3fd 100%);
+  --seg-track: #e0e8f7;
+  --switch-track: #d3dcef;
+  --day-empty: rgba(255, 255, 255, 0.7);
+
+  --hot: #2453ff;
+  --hot-rgb: 36, 83, 255;
+  --hot-deep: #1a3bc4;
+  --hot-deep-rgb: 26, 59, 196;
+  --hot-tint: #dde6ff;
+  --hot-tint-rgb: 221, 230, 255;
+  --page-focus: #ffffff;
+  --hot-gel-1: #6b8cff;
+  --hot-gel-2: #2c58f0;
+  --hot-gel-3: #1a3bc4;
+  --hot-light: #6a8dff;
+  --hot-dark: #1633a8;
+  --hot-bar: #9ab2ff;
+  --hot-rim-rgb: 10, 30, 120;
+  --hot-glow-rgb: 6, 16, 60;
+  --hot-inner: rgba(190, 210, 255, 0.5);
+  --on-hot: #ffffff;
+  --glint: #ffffff;
+
+  /* White gel pills; selected chips and the active tab go cobalt. */
+  --gel: linear-gradient(180deg, #ffffff 0%, #f1f5ff 46%, #d8e2f8 54%, #e9effc 100%);
+  --gel-nav: linear-gradient(180deg, #5a7dff 0%, #2a52e6 50%, #1a3bc4 52%, #2447d6 100%);
+  --gel-ring: #8ea2d6;
+  --gel-disabled: #8f9bb8;
+  --gel-disabled-ring: #7c88a6;
+  --on-gel: #0b1a45;
+  --on-gel-2: #3a4a78;
+  --sel: linear-gradient(180deg, #5a7dff 0%, #2c58f0 46%, #1a3bc4 54%, #2447d6 100%);
+  --sel-ring: #1530a0;
+  --on-sel: #ffffff;
+
+  /* Coral, violet, butter, mint: no pink, and nothing that melts into blue glass. */
+  --pink: #ff9c7f;
+  --pink-tint: #ffd9cc;
+  --pink-deep: #b23a1b;
+  --sky: #c4b3f4;
+  --sky-tint: #e7defc;
+  --sky-deep: #5b3fb0;
+
+  --chrome: linear-gradient(180deg, #ffffff 0%, #eef3fb 44%, #d3dcea 56%, #e6ecf5 84%, #fafcff 100%);
+  --orb-done: radial-gradient(120% 95% at 50% 0%, #ffffff 0%, #dbe3f0 55%, #a7b6cf 100%);
+  --holo: linear-gradient(112deg, #e2ff9a 0%, #c8f0ff 24%, #cdd8ff 46%, #e3e0ff 66%, #d2fff0 84%, #e2ff9a 100%);
+  --wordmark-fill: linear-gradient(180deg, #b9c6e6 0%, #ffffff 30%, #dbe3f5 47%, #6f80ad 53%, #a9b8dc 70%, #eef3ff 86%, #b3c1e3 100%);
+  --wordmark-ink: #ffffff;
+  --wordmark-stroke: #0b1a45;
+  --wordmark-shadow: rgba(6, 16, 60, 0.6);
+
+  --disc-plate:
+    radial-gradient(circle, rgba(255, 255, 255, 0) 0 54%, rgba(255, 255, 255, 0.4) 56%, rgba(255, 255, 255, 0) 74%, rgba(255, 255, 255, 0.45) 99%),
+    conic-gradient(
+      from 18deg,
+      #f3f6fc 0deg,
+      #e8ffb0 24deg,
+      #f1f4fb 48deg,
+      #eef2fa 92deg,
+      #cfe4ff 118deg,
+      #d7f8f4 142deg,
+      #f1f4fb 168deg,
+      #f3f6fc 200deg,
+      #e3e0ff 224deg,
+      #e8ffb0 246deg,
+      #f1f4fb 272deg,
+      #eef2fa 300deg,
+      #cfd9ff 326deg,
+      #f3f6fc 360deg
+    );
+  --groove-dark: rgba(11, 26, 69, 0.06);
+  --hub-2: #eef3fb;
+  --hub-3: #d9e2f1;
+  --rim-2: #c2cde2;
+  --rim-3: #7a8cb3;
+  --rim-4: #d3dcec;
+
+  --lcd-face: linear-gradient(180deg, #c2d0e6 0%, #d3def0 100%);
+  --lcd-ink: #0a1733;
+  --lcd-ink-2: #2b3d63;
+  --lcd-ghost: rgba(10, 23, 51, 0.08);
+  --lcd-recess: rgba(6, 16, 60, 0.3);
+  --lcd-bezel: #fbfdff;
+  --lcd-bezel-rim: #9fb0d0;
+
+  --sticky: linear-gradient(180deg, #f4ffa8 0%, #e9fb86 100%);
+  --stamp: #1a3bc4;
+
+  --heat-lo: #eef2fb;
+  --heat-hi: #a3b8ff;
+  --history-1: #dbe4fa;
+  --history-2: #7f9cf0;
+  --lv-0: #dde4f2;
+  --lv-1: #9aa9c8;
+  --lv-2: #233463;
+  --db-link: rgba(36, 83, 255, 0.35);
+}
+
+/* ---------- Cherry: crimson lacquer page, blush-white glass, black gel, chrome trim ----------
+ * White text on the page; cards keep a near-black wine ink. The red/pink-leaning one. */
+
+:root[data-gl-colour='cherry'] {
+  --bg: #9e1030;
+  --page-glows:
+    radial-gradient(80% 42% at 100% 0%, rgba(240, 60, 90, 0.45) 0%, rgba(240, 60, 90, 0) 70%),
+    radial-gradient(70% 36% at 0% 22%, rgba(70, 0, 25, 0.4) 0%, rgba(70, 0, 25, 0) 70%);
+  --sphere: radial-gradient(circle at 34% 30%, #ffffff 0%, #ffc2cf 24%, #ff4d6d 62%, #b3102f 100%);
+  --sphere-opacity: 0.5;
+
+  --surface: #fffafb;
+  --surface-2: #fcf0f2;
+  --surface-3: #f2dde2;
+  --card-ink: #2a0a14;
+  --card-ink-2: #6e3a48;
+  --page-ink: #ffffff;
+  --page-ink-2: #ffe1e8;
+  --edge-rgb: 42, 10, 20;
+  --shade-rgb: 50, 0, 15;
+
+  --card-solid: rgba(255, 248, 249, 0.96);
+  --card-border: rgba(255, 255, 255, 0.7);
+  --card-glass: linear-gradient(180deg, rgba(255, 251, 252, 0.95) 0%, rgba(255, 246, 247, 0.92) 100%);
+  --dock-solid: rgba(255, 246, 248, 0.96);
+  --dock-glass: linear-gradient(180deg, rgba(255, 250, 251, 0.94) 0%, rgba(250, 236, 239, 0.9) 100%);
+  --bar-solid: rgba(255, 248, 249, 0.97);
+  --bar-glass: linear-gradient(180deg, rgba(255, 250, 251, 0.95), rgba(252, 240, 243, 0.92));
+  --pill-solid: rgba(255, 248, 249, 0.96);
+  --pill-glass: rgba(255, 246, 248, 0.86);
+  --pill-border: rgba(255, 255, 255, 0.7);
+  --datepill: rgba(255, 246, 248, 0.9);
+  --sheet-bg: linear-gradient(180deg, #fffafb 0%, #f8ecef 120px, #f8ecef 100%);
+  --sheet-foot: #f8ecef;
+  --sheet-foot-glass: rgba(248, 236, 239, 0.86);
+  --dialog-bg: linear-gradient(180deg, #fffafb 0%, #fcf0f2 100%);
+  --seg-track: #f3e2e6;
+  --switch-track: #ead5da;
+  --day-empty: rgba(255, 255, 255, 0.7);
+
+  --hot: #d0103a;
+  --hot-rgb: 208, 16, 58;
+  --hot-deep: #a50d2c;
+  --hot-deep-rgb: 165, 13, 44;
+  --hot-tint: #fde0e6;
+  --hot-tint-rgb: 253, 224, 230;
+  --page-focus: #ffffff;
+  --hot-gel-1: #f0607e;
+  --hot-gel-2: #d01a3e;
+  --hot-gel-3: #a00c2a;
+  --hot-light: #ec4a6c;
+  --hot-dark: #8f0a25;
+  --hot-bar: #f08ca2;
+  --hot-rim-rgb: 100, 0, 20;
+  --hot-glow-rgb: 60, 0, 15;
+  --hot-inner: rgba(255, 170, 190, 0.5);
+  --on-hot: #ffffff;
+  --glint: #ffffff;
+
+  /* Menstrual goes a cooler orchid so it stays apart from blush glass and cherry red. */
+  --pink: #ee9cc8;
+  --pink-tint: #f8cfe4;
+  --pink-deep: #a3256a;
+
+  --holo: linear-gradient(112deg, #ffd0dc 0%, #ffe3cf 24%, #f3d6ff 46%, #d9e9ff 66%, #ffeef2 84%, #ffd0dc 100%);
+  --wordmark-fill: linear-gradient(180deg, #c9cbd3 0%, #ffffff 30%, #e3e5ea 47%, #7b7e88 53%, #b5b8c1 70%, #f2f3f6 86%, #c0c3cb 100%);
+  --wordmark-ink: #ffffff;
+  --wordmark-stroke: #3a0612;
+  --wordmark-shadow: rgba(50, 0, 15, 0.55);
+
+  --disc-plate:
+    radial-gradient(circle, rgba(255, 255, 255, 0) 0 54%, rgba(255, 255, 255, 0.4) 56%, rgba(255, 255, 255, 0) 74%, rgba(255, 255, 255, 0.45) 99%),
+    conic-gradient(
+      from 18deg,
+      #f7f3f4 0deg,
+      #ffc9d4 24deg,
+      #f5f1f2 48deg,
+      #f3eff0 92deg,
+      #ffd9c9 118deg,
+      #f3e1ff 142deg,
+      #f5f1f2 168deg,
+      #f7f3f4 200deg,
+      #ffe9c7 224deg,
+      #ffc9d4 246deg,
+      #f5f1f2 272deg,
+      #f3eff0 300deg,
+      #e2dcff 326deg,
+      #f7f3f4 360deg
+    );
+  --groove-dark: rgba(50, 0, 15, 0.05);
+
+  --lcd-face: linear-gradient(180deg, #d8cdd0 0%, #e4dbdd 100%);
+  --lcd-ink: #22080f;
+  --lcd-ink-2: #4a2730;
+  --lcd-ghost: rgba(34, 8, 15, 0.08);
+  --lcd-recess: rgba(50, 0, 15, 0.28);
+  --lcd-bezel: #fffafb;
+  --lcd-bezel-rim: #c2adb2;
+
+  --sticky: linear-gradient(180deg, #fff7e6 0%, #fbeccf 100%);
+  --stamp: #a50d2c;
+
+  --heat-lo: #f9eef0;
+  --heat-hi: #f29aae;
+  --lv-0: #f0e2e5;
+  --lv-1: #bfa2aa;
+  --lv-2: #3a1520;
+  --db-link: rgba(208, 16, 58, 0.35);
+}
+
+/* ---------- Gold: champagne-to-gold page, cream glass, gold chrome, espresso gel, burgundy ---------- */
+
+:root[data-gl-colour='gold'] {
+  --bg: #d2a84e;
+  --page-glows:
+    radial-gradient(80% 42% at 100% 0%, rgba(255, 240, 196, 0.6) 0%, rgba(255, 240, 196, 0) 70%),
+    radial-gradient(70% 36% at 0% 22%, rgba(176, 112, 28, 0.35) 0%, rgba(176, 112, 28, 0) 70%);
+  --sphere: radial-gradient(circle at 34% 30%, #ffffff 0%, #fff1c4 26%, #f2c560 62%, #b98322 100%);
+  --sphere-opacity: 0.55;
+
+  --surface: #fffcf4;
+  --surface-2: #f8f0de;
+  --surface-3: #ead9b8;
+  --card-ink: #2a1a0c;
+  --card-ink-2: #66503a;
+  --page-ink-2: #3f2a10;
+  --on-ink: #fffcf4;
+  --edge-rgb: 42, 26, 12;
+  --shade-rgb: 80, 50, 10;
+  --hi: #fffdf6;
+  --hi-soft: rgba(255, 252, 240, 0.8);
+
+  --card-solid: rgba(255, 251, 240, 0.95);
+  --card-border: rgba(255, 252, 242, 0.75);
+  --card-glass: linear-gradient(180deg, rgba(255, 252, 243, 0.92) 0%, rgba(255, 247, 228, 0.84) 100%);
+  --dock-solid: rgba(255, 250, 236, 0.96);
+  --dock-glass: linear-gradient(180deg, rgba(255, 252, 243, 0.92) 0%, rgba(248, 236, 206, 0.88) 100%);
+  --bar-solid: rgba(255, 251, 240, 0.97);
+  --bar-glass: linear-gradient(180deg, rgba(255, 252, 243, 0.94), rgba(250, 241, 220, 0.9));
+  --pill-solid: rgba(255, 251, 240, 0.95);
+  --pill-glass: rgba(255, 249, 234, 0.82);
+  --pill-border: rgba(255, 252, 242, 0.75);
+  --datepill: rgba(255, 250, 236, 0.85);
+  --sheet-bg: linear-gradient(180deg, #fffcf4 0%, #f6ecd6 120px, #f6ecd6 100%);
+  --sheet-foot: #f6ecd6;
+  --sheet-foot-glass: rgba(246, 236, 214, 0.86);
+  --dialog-bg: linear-gradient(180deg, #fffcf4 0%, #f8f0de 100%);
+  --seg-track: #efe3c8;
+  --switch-track: #e6d6b4;
+  --day-empty: rgba(255, 252, 243, 0.75);
+
+  --hot: #8e1b3c;
+  --hot-rgb: 142, 27, 60;
+  --hot-deep: #7d1534;
+  --hot-deep-rgb: 125, 21, 52;
+  --hot-tint: #efdcc6;
+  --hot-tint-rgb: 239, 220, 198;
+  --hot-gel-1: #a63a52;
+  --hot-gel-2: #86203a;
+  --hot-gel-3: #5e0f26;
+  --hot-light: #9a2f48;
+  --hot-dark: #500c20;
+  --hot-bar: #b9805a;
+  --hot-rim-rgb: 70, 5, 25;
+  --hot-glow-rgb: 90, 30, 10;
+  --hot-inner: rgba(240, 200, 170, 0.4);
+  --on-hot: #ffffff;
+
+  /* Espresso gel with a gold label. */
+  --gel: linear-gradient(180deg, #5e4632 0%, #38271a 46%, #22160c 54%, #302114 100%);
+  --gel-nav: linear-gradient(180deg, #5e4632 0%, #332317 50%, #22160c 52%, #302114 100%);
+  --gel-ring: #1c1209;
+  --gel-disabled: #6e5a47;
+  --gel-disabled-ring: #5b4939;
+  --on-gel: #f8e3a8;
+  --on-gel-2: #d9c08a;
+
+  /* Terracotta, sky, saffron, mint: no pink, and nothing that melts into cream glass. */
+  --pink: #e79a78;
+  --pink-tint: #f5d4c0;
+  --pink-deep: #9a3f1e;
+  --butter: #eec456;
+  --butter-tint: #f6e0a0;
+  --butter-deep: #6e5000;
+
+  --chrome: linear-gradient(180deg, #fffbea 0%, #f6e7bd 44%, #e2c983 56%, #efdca6 84%, #fff8e0 100%);
+  --orb-done: radial-gradient(120% 95% at 50% 0%, #fffbea 0%, #ecd697 55%, #c49a45 100%);
+  --orb-halo: rgba(255, 251, 236, 0.95);
+  --holo: linear-gradient(112deg, #ffe9a8 0%, #f6dcbf 24%, #e4e2c4 46%, #dcefd6 66%, #fff3c4 84%, #ffe9a8 100%);
+  --holo-rim: rgba(255, 251, 236, 0.85);
+  --wordmark-fill: linear-gradient(180deg, #8a6420 0%, #fff6d6 30%, #d9b45c 47%, #4a3108 53%, #8c6a26 70%, #f0d58c 86%, #8f6b24 100%);
+  --wordmark-ink: #4a3108;
+  --wordmark-stroke: #3a2606;
+  --wordmark-shadow: rgba(255, 246, 214, 0.7);
+
+  --disc-plate:
+    radial-gradient(circle, rgba(255, 255, 255, 0) 0 54%, rgba(255, 255, 255, 0.4) 56%, rgba(255, 255, 255, 0) 74%, rgba(255, 255, 255, 0.45) 99%),
+    conic-gradient(
+      from 18deg,
+      #fbf3df 0deg,
+      #f9dfb8 24deg,
+      #f9f0da 48deg,
+      #f7edd5 92deg,
+      #f3dc9c 118deg,
+      #e8efcf 142deg,
+      #f9f0da 168deg,
+      #fbf3df 200deg,
+      #ffe7a6 224deg,
+      #f3e2bf 246deg,
+      #f9f0da 272deg,
+      #f7edd5 300deg,
+      #e9ecd2 326deg,
+      #fbf3df 360deg
+    );
+  --groove-dark: rgba(80, 50, 10, 0.06);
+  --hub-1: #fffcf0;
+  --hub-2: #f6ebcd;
+  --hub-3: #e6d29e;
+  --hub-ring: #fffcf0;
+  --rim-1: #fffbe8;
+  --rim-2: #e7cf8d;
+  --rim-3: #a8822f;
+  --rim-4: #efdfae;
+  --bead-halo: #fffcf4;
+
+  /* A gold-green "calculator" LCD. */
+  --lcd-face: linear-gradient(180deg, #c3c08f 0%, #d1cfa2 100%);
+  --lcd-ink: #1d1c08;
+  --lcd-ink-2: #3f3c18;
+  --lcd-ghost: rgba(29, 28, 8, 0.09);
+  --lcd-recess: rgba(70, 60, 10, 0.3);
+  --lcd-bezel: #fffcf0;
+  --lcd-bezel-rim: #b9a46a;
+
+  --sticky: linear-gradient(180deg, #fff8e6 0%, #f8ecc9 100%);
+  --tape: linear-gradient(180deg, rgba(255, 252, 243, 0.78), rgba(246, 238, 220, 0.62));
+  --stamp: #7d1534;
+
+  --heat-lo: #f8f1e1;
+  --heat-hi: #e2b25a;
+  --history-1: #f1e0b5;
+  --history-2: #c99a3e;
+  --lv-0: #ece0c6;
+  --lv-1: #b9a27a;
+  --lv-2: #3d2a14;
+  --db-link: rgba(142, 27, 60, 0.35);
+}
+
+/* ---------- Heat tables follow the colourway (Silver keeps its exact JS ramp) ---------- */
+
+@supports (background: color-mix(in srgb, red 50%, blue)) {
+  :root[data-gl-colour]:not([data-gl-colour='silver']) .gl-heat__val {
+    background: color-mix(in srgb, var(--heat-hi) var(--heat-at), var(--heat-lo));
+  }
+}
+
+/* ---------- Settings › Colour: each swatch previews its own colourway, whatever is active ----------
+ * The chip is the page colour, with a mini card (ink line + accent dot) and a gel pill on it. */
+
+.gl-swatch--silver {
+  --sw-bg: #efeef2;
+  --sw-card: #ffffff;
+  --sw-ink: #17161b;
+  --sw-gel: #222127;
+  --sw-accent: #ff4fa6;
+}
+
+.gl-swatch--onyx {
+  --sw-bg: #0e0e11;
+  --sw-card: #2a2a31;
+  --sw-ink: #f2f1f5;
+  --sw-gel: #e6e7ed;
+  --sw-accent: #c6f81e;
+}
+
+.gl-swatch--cobalt {
+  --sw-bg: #1640d6;
+  --sw-card: #eef3ff;
+  --sw-ink: #0b1a45;
+  --sw-gel: #ffffff;
+  --sw-accent: #2c58f0;
+}
+
+.gl-swatch--cherry {
+  --sw-bg: #9e1030;
+  --sw-card: #fff4f6;
+  --sw-ink: #2a0a14;
+  --sw-gel: #17161b;
+  --sw-accent: #d01a3e;
+}
+
+.gl-swatch--gold {
+  --sw-bg: #d2a84e;
+  --sw-card: #fffbf0;
+  --sw-ink: #2a1a0c;
+  --sw-gel: #38271a;
+  --sw-accent: #86203a;
+}

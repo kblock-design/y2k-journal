@@ -1,0 +1,113 @@
+/* Calendar: the selected day's summary, pinned just above the tab bar. */
+
+.screen--calendar {
+  padding-bottom: 76px;
+}
+
+.daybar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--tabbar-height) + var(--safe-bottom) + 8px);
+  z-index: 9;
+  max-width: calc(var(--app-max-width) - 16px);
+  margin: 0 auto;
+  width: calc(100% - 16px);
+  background: var(--win-face);
+  border: 2px solid var(--ink);
+  border-top: 4px solid var(--pink-hot);
+  box-shadow: 4px 4px 0 rgba(20, 18, 24, 0.55);
+}
+
+.daybar__row {
+  display: flex;
+  align-items: stretch;
+  gap: var(--space-2);
+  padding: 6px;
+}
+
+.daybar__toggle {
+  flex: 1;
+  min-width: 0;
+  min-height: var(--tap-min);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  padding: 4px 8px;
+  text-align: left;
+  background: var(--win-surface);
+  border: 0;
+  box-shadow: var(--bevel-in);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.daybar__toggle:disabled {
+  cursor: default;
+}
+
+.daybar__date {
+  font-family: var(--font-pixel);
+  font-size: 12px;
+  text-transform: uppercase;
+  color: var(--pink-deep);
+}
+
+.daybar__date::after {
+  content: ' ▴';
+}
+
+.daybar.is-open .daybar__date::after {
+  content: ' ▾';
+}
+
+.daybar__toggle:disabled .daybar__date::after {
+  content: '';
+}
+
+.daybar__glance {
+  font-family: var(--font-body);
+  font-size: 18px;
+  line-height: 1.1;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+.daybar__edit {
+  flex-shrink: 0;
+  min-width: 64px;
+}
+
+.daybar__full {
+  max-height: 46vh;
+  overflow-y: auto;
+  margin: 0 6px 6px;
+  padding: var(--space-2) var(--space-3);
+  background: var(--win-surface);
+  box-shadow: var(--bevel-in);
+}
+
+/* The colour key folds away so the calendar fits above the day bar. */
+.cal-key {
+  margin-top: var(--space-2);
+}
+
+.cal-key__summary {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap-min);
+  padding: 0 var(--space-3);
+  font-family: var(--font-pixel);
+  font-size: 12px;
+  text-transform: uppercase;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.cal-key .cal-legend {
+  margin-top: 0;
+}

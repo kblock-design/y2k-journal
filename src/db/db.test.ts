@@ -121,7 +121,7 @@ describe('JSON backup', () => {
     }
     const json = await exportJSON()
     const parsed = JSON.parse(json)
-    expect(parsed).toMatchObject({ app: 'burn-book', version: 1 })
+    expect(parsed).toMatchObject({ app: 'burn-book', version: 2 })
     expect(typeof parsed.exportedAt).toBe('string')
     expect(json).toContain('\n  ') // pretty-printed
 
@@ -228,5 +228,220 @@ describe('CSV export', () => {
     expect(csvField('say "hi"')).toBe('"say ""hi"""')
     expect(csvField('line1\nline2')).toBe('"line1\nline2"')
     expect(csvRow(['x', 'y,z', 'q"'])).toBe('x,"y,z","q"""')
+  })
+})
+
+// ---------------------------------------------------------------------------
+// Mood tracking levels
+// ---------------------------------------------------------------------------
+
+/** A version-1 backup as the app exported it before mood levels: all eight moods, no moodTracking. */
+const V1_BACKUP = {
+  app: 'burn-book',
+  version: 1,
+  exportedAt: '2026-09-01T20:00:00.000Z',
+  settings: { reminderTime: '21:00', defaultCycleLength: 30, defaultPeriodLength: 5, startedOn: '2026-06-01' },
+  logs: [
+    {
+      date: '2026-08-31',
+      flow: 'medium',
+      moods: {
+        moodSwings: 2,
+        irritability: 5,
+        sadness: 1,
+        anxiety: 3,
+        overwhelmed: 4,
+        sensitivity: 1,
+        lowInterest: 6,
+        concentration: 2,
+      },
+      physical: ['cramps'],
+      sleep: 'poor',
+      energy: 'low',
+      cravings: 'some',
+      loggedAt: Date.UTC(2026, 7, 31, 20),
+      backfilled: false,
+    },
+  ],
+  pets: [],
+}
+
+describe('mood tracking setting', () => {
+  it('a settings row written before the setting existed reads as advanced', async () => {
+    await db.settings.put({
+      id: 'settings',
+      reminderTime: '21:00',
+      defaultCycleLength: 30,
+      defaultPeriodLength: 5,
+      startedOn: '2026-06-01',
+    } as never)
+    expect(await getSettings()).toEqual({
+      reminderTime: '21:00',
+      defaultCycleLength: 30,
+      defaultPeriodLength: 5,
+      startedOn: '2026-06-01',
+      moodTracking: 'advanced',
+    })
+  })
+
+  it('defaults to advanced on a fresh install and saves a new level', async () => {
+    expect((await getSettings()).moodTracking).toBe('advanced')
+    await updateSettings({ moodTracking: 'basic' })
+    expect((await getSettings()).moodTracking).toBe('basic')
+    await updateSettings({ reminderTime: '22:00' })
+    expect((await getSettings()).moodTracking).toBe('basic')
+    await updateSettings({ moodTracking: 'off' })
+    expect(await getSettings()).toMatchObject({ moodTracking: 'off', reminderTime: '22:00' })
+  })
+})
+
+describe('backups with mood levels', () => {
+  it('imports a version-1 backup unchanged (all eight moods, setting defaults to advanced)', async () => {
+    expect(await importJSON(JSON.stringify(V1_BACKUP))).toBe(1)
+    expect(await getLog('2026-08-31')).toEqual(V1_BACKUP.logs[0])
+    expect(await getSettings()).toEqual({ ...V1_BACKUP.settings, moodTracking: 'advanced' })
+  })
+
+  it('version 1 still requires every mood, as that format always had them', async () => {
+    const { lowInterest: _x, ...seven } = V1_BACKUP.logs[0].moods
+    void _x
+    const bad = { ...V1_BACKUP, logs: [{ ...V1_BACKUP.logs[0], moods: seven }] }
+    await expect(importJSON(JSON.stringify(bad))).rejects.toThrow(/lowInterest/)
+  })
+
+  it('round-trips partial moods and the level (version 2)', async () => {
+    await updateSettings({ moodTracking: 'basic', startedOn: '2026-08-01' })
+    await saveLog(makeLog('2026-09-28')) // advanced: every mood
+    await saveLog(makeLog('2026-09-29', { moods: { moodSwings: 1, irritability: 3, sadness: 5, anxiety: 1 } }))
+    await saveLog(makeLog('2026-09-30', { moods: {} })) // off
+    const before = { settings: await getSettings(), logs: await getAllLogs() }
+    const json = await exportJSON()
+    expect(JSON.parse(json).version).toBe(2)
+    expect(JSON.parse(json).logs[2].moods).toEqual({})
+    await wipe()
+    expect(await importJSON(json)).toBe(3)
+    expect(await getSettings()).toEqual(before.settings)
+    expect(await getAllLogs()).toEqual(before.logs)
+    expect((await getLog('2026-09-30'))!.moods).toEqual({})
+    expect(Object.keys((await getLog('2026-09-29'))!.moods)).toHaveLength(4)
+  })
+
+  it('version 2: any subset of known moods, unknown keys dropped, missing moods object = none rated', async () => {
+    const base = JSON.parse(await exportJSON())
+    const logs = [
+      { ...makeLog('2026-10-01'), moods: { sadness: 2, mystery: 4 } },
+      (() => {
+        const { moods: _m, ...rest } = makeLog('2026-10-02')
+        void _m
+        return rest
+      })(),
+    ]
+    expect(await importJSON(JSON.stringify({ ...base, logs }))).toBe(2)
+    expect((await getLog('2026-10-01'))!.moods).toEqual({ sadness: 2 })
+    expect((await getLog('2026-10-02'))!.moods).toEqual({})
+  })
+
+  it('version 2 still rejects bad ratings and bad levels', async () => {
+    const base = JSON.parse(await exportJSON())
+    const badRating = { ...makeLog('2026-10-01'), moods: { anxiety: 0 } }
+    await expect(importJSON(JSON.stringify({ ...base, logs: [badRating] }))).rejects.toThrow(/anxiety/)
+    const notObject = { ...makeLog('2026-10-01'), moods: 'none' }
+    await expect(importJSON(JSON.stringify({ ...base, logs: [notObject] }))).rejects.toThrow(/moods/)
+    const badLevel = { ...base, settings: { ...base.settings, moodTracking: 'some' } }
+    await expect(importJSON(JSON.stringify(badLevel))).rejects.toThrow(/moodTracking/)
+    expect(await getLog('2026-10-01')).toBeUndefined()
+  })
+
+  it('CSV: an empty cell for each mood that was not rated', async () => {
+    await saveLog(makeLog('2026-10-01', { moods: { irritability: 5 } }))
+    await saveLog(makeLog('2026-10-02', { moods: {} }))
+    const lines = (await exportCSV()).split('\r\n')
+    const cells = (i: number) => Object.fromEntries(CSV_COLUMNS.map((c, j) => [c, lines[i].split(',')[j]]))
+    const basic = cells(1)
+    expect(basic.irritability).toBe('5')
+    for (const m of MOOD_ITEMS.filter((x) => x.key !== 'irritability')) expect(basic[m.key]).toBe('')
+    const off = cells(2)
+    for (const m of MOOD_ITEMS) expect(off[m.key]).toBe('')
+    expect(off.flow).toBe('light')
+    expect(lines[2].split(',')).toHaveLength(CSV_COLUMNS.length)
+  })
+})
+
+// ---------------------------------------------------------------------------
+// The ninth mood (selfCriticism), added after version-1 backups and old entries
+// ---------------------------------------------------------------------------
+
+/** The moods every version-1 backup (and every entry saved before the ninth mood) has. */
+const ORIGINAL_EIGHT = Object.keys(V1_BACKUP.logs[0].moods)
+
+describe('the ninth mood in backups and CSV', () => {
+  it('is a known mood that version-1 files never had', () => {
+    expect(MOOD_ITEMS.map((m) => m.key)).toContain('selfCriticism')
+    expect(ORIGINAL_EIGHT).toHaveLength(8)
+    expect(ORIGINAL_EIGHT).not.toContain('selfCriticism')
+  })
+
+  it('a version-1 backup with only the original eight moods imports; the ninth stays absent', async () => {
+    expect(await importJSON(JSON.stringify(V1_BACKUP))).toBe(1)
+    const moods = (await getLog('2026-08-31'))!.moods
+    expect(Object.keys(moods).sort()).toEqual([...ORIGINAL_EIGHT].sort())
+    expect('selfCriticism' in moods).toBe(false)
+  })
+
+  it('version 1 still requires each of the original eight (only the ninth is optional)', async () => {
+    for (const key of ORIGINAL_EIGHT) {
+      const moods: Record<string, number> = { ...V1_BACKUP.logs[0].moods }
+      delete moods[key]
+      const bad = { ...V1_BACKUP, logs: [{ ...V1_BACKUP.logs[0], moods }] }
+      await expect(importJSON(JSON.stringify(bad))).rejects.toThrow(new RegExp(`moods\\.${key}`))
+    }
+    expect(await getAllLogs()).toEqual([])
+  })
+
+  it('version 1 accepts the ninth mood when present, and still validates it', async () => {
+    const withNinth = { ...V1_BACKUP, logs: [{ ...V1_BACKUP.logs[0], moods: { ...V1_BACKUP.logs[0].moods, selfCriticism: 4 } }] }
+    expect(await importJSON(JSON.stringify(withNinth))).toBe(1)
+    expect((await getLog('2026-08-31'))!.moods.selfCriticism).toBe(4)
+    await wipe()
+    const bad = { ...V1_BACKUP, logs: [{ ...V1_BACKUP.logs[0], moods: { ...V1_BACKUP.logs[0].moods, selfCriticism: 7 } }] }
+    await expect(importJSON(JSON.stringify(bad))).rejects.toThrow(/selfCriticism/)
+    expect(await getAllLogs()).toEqual([])
+  })
+
+  it('version 2 round-trips the ninth mood next to an old eight-mood entry', async () => {
+    await saveLog(makeLog('2026-09-30', { moods: { ...V1_BACKUP.logs[0].moods } as DayLog['moods'] })) // old entry
+    await saveLog(makeLog('2026-10-01')) // every mood, ninth included
+    await saveLog(makeLog('2026-10-02', { moods: { selfCriticism: 6 } })) // only the ninth
+    const before = await getAllLogs()
+    expect(before[1].moods.selfCriticism).toBeDefined()
+    const json = await exportJSON()
+    expect(JSON.parse(json).version).toBe(2)
+    await wipe()
+    expect(await importJSON(json)).toBe(3)
+    const after = await getAllLogs()
+    expect(after).toEqual(before)
+    expect('selfCriticism' in after[0].moods).toBe(false)
+    expect(Object.keys(after[1].moods)).toHaveLength(MOOD_ITEMS.length)
+    expect(after[1].moods.selfCriticism).toBe(before[1].moods.selfCriticism)
+    expect(after[2].moods).toEqual({ selfCriticism: 6 })
+  })
+
+  it('CSV has a selfCriticism column in MOOD_ITEMS order, blank for entries saved before it existed', async () => {
+    const keys = MOOD_ITEMS.map((m) => m.key)
+    const col = CSV_COLUMNS.indexOf('selfCriticism')
+    expect(col).toBe(2 + keys.indexOf('selfCriticism'))
+    expect(CSV_COLUMNS[col - 1]).toBe('sensitivity')
+    expect(CSV_COLUMNS[col + 1]).toBe('lowInterest')
+
+    await saveLog(makeLog('2026-09-30', { moods: { ...V1_BACKUP.logs[0].moods } as DayLog['moods'] })) // old entry
+    await saveLog(makeLog('2026-10-01', { moods: { ...V1_BACKUP.logs[0].moods, selfCriticism: 5 } as DayLog['moods'] }))
+    const lines = (await exportCSV()).split('\r\n')
+    expect(lines[0].split(',')[col]).toBe('selfCriticism')
+    const cells = (i: number) => Object.fromEntries(CSV_COLUMNS.map((c, j) => [c, lines[i].split(',')[j]]))
+    const old = cells(1)
+    expect(old.selfCriticism).toBe('')
+    for (const key of ORIGINAL_EIGHT) expect(old[key]).toBe(String((V1_BACKUP.logs[0].moods as Record<string, number>)[key]))
+    expect(cells(2).selfCriticism).toBe('5')
+    for (const i of [1, 2]) expect(lines[i].split(',')).toHaveLength(CSV_COLUMNS.length)
   })
 })

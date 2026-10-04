@@ -1,0 +1,93 @@
+/* ---- Stickers ---------------------------------------------------------- */
+
+.sticker {
+  flex: none;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+  overflow: visible;
+  max-width: none;
+}
+
+.sticker__twinkle {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .sticker--sparkle .sticker__twinkle {
+    animation: sticker-twinkle 2.6s ease-in-out infinite;
+  }
+  /* every cut stone: gem, gemRound, gemEmerald, ... */
+  .sticker[class*='sticker--gem'] .sticker__twinkle {
+    animation: sticker-glint 3.2s ease-in-out infinite;
+  }
+  .sticker--discoBall .sticker__twinkle {
+    animation: sticker-glint 3.6s ease-in-out infinite;
+  }
+}
+
+@keyframes sticker-twinkle {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(0.62) rotate(20deg);
+    opacity: 0.6;
+  }
+}
+
+@keyframes sticker-glint {
+  0%,
+  55%,
+  100% {
+    transform: scale(0.35) rotate(0deg);
+    opacity: 0.25;
+  }
+  75% {
+    transform: scale(1.1) rotate(45deg);
+    opacity: 1;
+  }
+}
+
+/* ---- Rhinestone trim --------------------------------------------------- */
+
+.rhinestone-row {
+  --rhinestone-size: 14px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2px;
+  width: 100%;
+  min-height: var(--rhinestone-size);
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* silver chain the stones sit on */
+.rhinestone-row::before {
+  content: '';
+  position: absolute;
+  left: calc(var(--rhinestone-size) / 2);
+  right: calc(var(--rhinestone-size) / 2);
+  top: 50%;
+  height: 2px;
+  transform: translateY(-50%);
+  border-radius: 1px;
+  background: linear-gradient(#ffffff, #b9bbd3);
+}
+
+.rhinestone {
+  position: relative;
+  display: block;
+  flex: 0 1 var(--rhinestone-size);
+  width: var(--rhinestone-size);
+  min-width: 6px;
+  max-width: var(--rhinestone-size);
+  aspect-ratio: 1;
+  height: auto;
+}

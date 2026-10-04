@@ -1,5 +1,7 @@
 import {
+  DEFAULT_SETTINGS,
   MOOD_ITEMS,
+  MOOD_TRACKING_LEVELS,
   PHYSICAL_SYMPTOMS,
   type Cravings,
   type DayLog,
@@ -17,8 +19,14 @@ import {
 // Pure (no IndexedDB) helpers for the JSON backup format and CSV export.
 
 export const BACKUP_APP = 'burn-book'
-/** Bump when the backup shape changes; parseBackup must keep reading older versions. */
-export const BACKUP_VERSION = 1
+/**
+ * Bump when the backup shape changes; parseBackup must keep reading older versions.
+ * 1: every log has all eight mood ratings that existed then (V1_MOOD_KEYS); settings without
+ *    moodTracking. Moods added later (selfCriticism) are optional there.
+ * 2: a log's `moods` holds only the moods that were rated (any subset of MOOD_ITEMS);
+ *    settings.moodTracking ('off' | 'basic' | 'advanced').
+ */
+export const BACKUP_VERSION = 2
 
 export interface Backup {
   app: typeof BACKUP_APP
@@ -37,6 +45,17 @@ const SLEEPS: readonly Sleep[] = ['poor', 'ok', 'good']
 const ENERGIES: readonly Energy[] = ['low', 'ok', 'high']
 const CRAVINGS: readonly Cravings[] = ['none', 'some', 'strong']
 const MOOD_KEYS: readonly MoodKey[] = MOOD_ITEMS.map((m) => m.key)
+/** The moods that existed when version-1 backups were written; those files must contain all of them. */
+const V1_MOOD_KEYS: readonly MoodKey[] = [
+  'moodSwings',
+  'irritability',
+  'sadness',
+  'anxiety',
+  'overwhelmed',
+  'sensitivity',
+  'lowInterest',
+  'concentration',
+]
 const PHYSICAL_KEYS: readonly PhysicalKey[] = PHYSICAL_SYMPTOMS.map((p) => p.key)
 
 const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/
@@ -79,25 +98,43 @@ export function validateSettings(v: unknown, where = 'settings'): Settings {
   if (typeof v.reminderTime !== 'string' || !TIME_RE.test(v.reminderTime)) {
     fail(`${where}.reminderTime`, 'must be HH:MM')
   }
+  // Absent in version-1 backups (made before the setting existed): today's behaviour.
+  const moodTracking =
+    v.moodTracking === undefined
+      ? DEFAULT_SETTINGS.moodTracking
+      : oneOf(v.moodTracking, MOOD_TRACKING_LEVELS, `${where}.moodTracking`)
   return {
     reminderTime: v.reminderTime,
     defaultCycleLength: positiveInt(v.defaultCycleLength, `${where}.defaultCycleLength`),
     defaultPeriodLength: positiveInt(v.defaultPeriodLength, `${where}.defaultPeriodLength`),
     startedOn: isoDate(v.startedOn, `${where}.startedOn`),
+    moodTracking,
   }
 }
 
+export interface ValidateLogOptions {
+  /**
+   * Version-1 backups: `moods` must be an object with all eight V1_MOOD_KEYS ratings (as that
+   * format always had); moods added since are optional. Otherwise any subset of the known
+   * moods is fine and a missing `moods` object means nothing was rated.
+   */
+  requireAllMoods?: boolean
+}
+
 /** Returns a clean DayLog (unknown extra fields dropped) or throws. */
-export function validateLog(v: unknown, where = 'log'): DayLog {
+export function validateLog(v: unknown, where = 'log', options: ValidateLogOptions = {}): DayLog {
   if (!isRecord(v)) fail(where, 'must be an object')
   const date = isoDate(v.date, `${where}.date`)
   const at = `${where} (${date})`
 
-  if (!isRecord(v.moods)) fail(`${at}.moods`, 'must be an object')
-  const rawMoods = v.moods
-  const moods = {} as Record<MoodKey, Rating>
+  const requireAll = options.requireAllMoods === true
+  if (!isRecord(v.moods) && (requireAll || v.moods !== undefined)) fail(`${at}.moods`, 'must be an object')
+  const rawMoods: Record<string, unknown> = isRecord(v.moods) ? v.moods : {}
+  // Only rated moods are kept; a mood that wasn't rated stays absent ("not recorded").
+  const moods: Partial<Record<MoodKey, Rating>> = {}
   for (const key of MOOD_KEYS) {
     const r = rawMoods[key]
+    if (r === undefined && !(requireAll && V1_MOOD_KEYS.includes(key))) continue
     if (typeof r !== 'number' || !Number.isInteger(r) || r < 1 || r > 6) {
       fail(`${at}.moods.${key}`, 'must be an integer rating 1-6')
     }
@@ -159,7 +196,8 @@ export function parseBackup(text: string): Backup {
   if (!Array.isArray(raw.pets)) fail('pets', 'must be an array')
 
   const settings = validateSettings(raw.settings)
-  const logs = raw.logs.map((l, i) => validateLog(l, `logs[${i}]`))
+  const requireAllMoods = raw.version === 1
+  const logs = raw.logs.map((l, i) => validateLog(l, `logs[${i}]`, { requireAllMoods }))
   const pets = raw.pets.map((p, i) => validatePet(p, `pets[${i}]`))
 
   const seenDates = new Set<string>()

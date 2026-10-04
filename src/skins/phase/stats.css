@@ -1,0 +1,1029 @@
+/* Phase — Stats: a pinned view switch, rounded cards, big numbers, dot plot, heat grids.
+   Every card: a short title, the key number or chart, one caption line. */
+
+.ph-stats {
+  gap: 14px;
+}
+
+/* ---------- View switch (pinned under the status bar) ---------- */
+
+.ph-stats-switch {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 20;
+  margin: -8px calc(-1 * var(--page-x)) -4px;
+  padding: 6px var(--page-x);
+  background: var(--bg);
+  /* fills the notch strip above it so cards scroll under cleanly */
+  box-shadow: 0 calc(-1 * env(safe-area-inset-top, 0px)) 0 0 var(--bg);
+}
+
+.ph-stats-switch__group {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 999px;
+  background: var(--surface-2);
+}
+
+.ph-stats-switch__opt {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.15;
+  touch-action: manipulation;
+}
+
+.ph-stats-switch__opt.is-on {
+  background: var(--ink);
+  color: var(--cream);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ph-stats-switch__opt {
+    transition: background-color 0.18s ease, color 0.18s ease;
+  }
+}
+
+/* ---------- Cards and shared text ---------- */
+
+.ph-scard {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ph-scard__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ph-scard .ph-h3 {
+  margin-top: 6px;
+}
+
+.ph-footnote {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 0 6px;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+.ph-footnote .ph-icon {
+  flex: none;
+  margin-top: 1px;
+}
+
+/* Text button that jumps to another view; a full-height tap target. */
+.ph-link.ph-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  align-self: flex-start;
+  min-height: 44px;
+  margin: -8px 0;
+  padding: 0;
+  font-size: 14px;
+}
+
+/* Locked panels */
+
+.ph-locked {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.ph-locked__icon {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--surface);
+}
+
+.ph-locked__text {
+  min-width: 0;
+  padding-top: 4px;
+}
+
+.ph-locked__text p + p {
+  margin-top: 6px;
+}
+
+/* Tiles */
+
+.ph-tiles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.ph-tiles--3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.ph-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+}
+
+.ph-tiles--3 .ph-tile {
+  padding: 10px;
+}
+
+.ph-tile--wide {
+  grid-column: 1 / -1;
+}
+
+.ph-tile__label {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.25;
+  color: var(--ink-2);
+}
+
+.ph-tile__data {
+  min-width: 0;
+}
+
+.ph-tile__value {
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.ph-tiles--3 .ph-tile__value {
+  font-size: 23px;
+}
+
+.ph-tile__value--word,
+.ph-tiles--3 .ph-tile__value--word {
+  font-size: 16px;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.ph-tile__unit {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.ph-tile__note {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  line-height: 1.3;
+  color: var(--ink-2);
+}
+
+.ph-tile.is-muted .ph-tile__value {
+  color: var(--ink-2);
+}
+
+/* Big number with a shape */
+
+.ph-bignum {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.ph-bignum__shape {
+  flex: none;
+  width: 60px;
+  height: 60px;
+}
+
+.ph-bignum__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.15;
+}
+
+.ph-bignum__label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-2);
+}
+
+.ph-bignum__value {
+  font-size: 38px;
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+.ph-bignum__unit {
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+.ph-bignum__note {
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+/* Thin rounded progress bar */
+
+.ph-bar__track {
+  display: block;
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--surface-3);
+}
+
+.ph-bar__fill {
+  display: block;
+  height: 100%;
+  min-width: 8px;
+  border-radius: 999px;
+}
+
+.ph-fill--yellow {
+  background: var(--yellow-mid);
+}
+.ph-fill--green {
+  background: var(--green-mid);
+}
+
+/* Check-in rate */
+
+.ph-rate {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ph-rate__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.ph-rate__label {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.ph-rate__val {
+  font-size: 22px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Empty stats */
+
+.ph-stats-empty {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ph-stats-empty__title {
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.ph-stats-empty__lead {
+  color: var(--ink-2);
+}
+
+.ph-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.ph-steps__item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.ph-steps__badge {
+  position: relative;
+  flex: none;
+  width: 52px;
+  height: 52px;
+}
+
+.ph-steps__badge .ph-shape-svg {
+  position: absolute;
+  inset: 0;
+}
+
+.ph-steps__badge > span {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--tone-on);
+}
+
+.ph-steps__text {
+  font-size: 15px;
+}
+
+/* ---------- Overview: headline ---------- */
+
+.ph-headline {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ph-headline__row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.ph-headline__badge {
+  position: relative;
+  flex: none;
+  width: 84px;
+  height: 84px;
+}
+
+.ph-headline__badge .ph-shape-svg {
+  position: absolute;
+  inset: 0;
+}
+
+.ph-headline__badge-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.05;
+  text-align: center;
+  color: var(--tone-on);
+}
+
+.ph-headline__num {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.ph-headline__unit {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.ph-headline__text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.ph-headline__title {
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.ph-headline__title strong {
+  font-weight: 700;
+}
+
+.ph-headline__sub {
+  font-size: 13px;
+  line-height: 1.35;
+  color: var(--ink-2);
+}
+
+/* ---------- Overview: one line per highlight ---------- */
+
+.ph-hl {
+  display: flex;
+  flex-direction: column;
+}
+
+.ph-hl__item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  border-top: 1px solid var(--line);
+}
+
+.ph-hl__badge {
+  flex: none;
+  display: inline-flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 3px;
+  min-width: 82px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: var(--tone-tint);
+}
+
+.ph-hl__num {
+  font-size: 15px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.ph-hl__unit {
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.ph-hl__text {
+  min-width: 0;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.ph-hl__text strong {
+  font-weight: 600;
+}
+
+/* Unlock checklist */
+
+.ph-unlock {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ph-unlock__progress {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ph-unlock__count {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.ph-unlock__list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ph-unlock__step {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.ph-unlock__box {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 2px var(--surface-3);
+}
+
+.ph-unlock__step.is-done .ph-unlock__box {
+  background: var(--green);
+  color: var(--green-on);
+  box-shadow: none;
+}
+
+.ph-unlock__label {
+  min-width: 0;
+  padding-top: 2px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.ph-unlock__note {
+  display: block;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--ink-2);
+}
+
+/* ---------- Cycle history: small column chart ---------- */
+
+.ph-cchart {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ph-cchart__plot {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 6px;
+  height: 92px;
+  margin-top: 18px; /* room for the value labels above the tallest bar */
+  border-bottom: 2px solid var(--surface-3);
+}
+
+.ph-cchart__col {
+  display: flex;
+  align-items: flex-end;
+  flex: 1 1 0;
+  max-width: 32px;
+  height: 100%;
+}
+
+.ph-cchart__bar {
+  position: relative;
+  width: 100%;
+  min-height: 6px;
+  border-radius: 8px 8px 3px 3px;
+  background: var(--blue-mid);
+}
+
+.ph-cchart__val {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding-bottom: 2px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.ph-cchart__typical {
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  border-top: 2px dashed rgb(var(--ink-rgb) / 0.45);
+  pointer-events: none;
+}
+
+.ph-cchart__axis {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--ink-2);
+}
+
+.ph-cchart__key {
+  display: inline-block;
+  width: 16px;
+  vertical-align: middle;
+  border-top: 2px dashed rgb(var(--ink-rgb) / 0.45);
+}
+
+/* ---------- Before vs after: one compact row per mood ---------- */
+
+.ph-basis {
+  font-size: 14px;
+}
+
+.ph-basis .ph-chip {
+  margin-right: 4px;
+}
+
+.ph-db-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+.ph-db-list {
+  display: flex;
+  flex-direction: column;
+}
+
+/* label + meta | 1–6 track | difference */
+.ph-db {
+  display: grid;
+  grid-template-columns: minmax(0, 40%) minmax(0, 1fr) 46px;
+  align-items: center;
+  gap: 2px 8px;
+  padding: 6px 0;
+  border-top: 1px solid var(--line);
+}
+
+.ph-db:first-child {
+  border-top: 0;
+}
+
+.ph-db--total {
+  margin-bottom: 4px;
+  padding: 8px 10px;
+  border-top: 0;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+}
+
+.ph-db--total + .ph-db {
+  border-top: 0;
+}
+
+.ph-db__name {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.ph-db__label {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.ph-db--total .ph-db__label {
+  font-weight: 700;
+}
+
+.ph-db__meta {
+  font-size: 12px;
+  line-height: 1.3;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.ph-db__diff {
+  justify-self: end;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.ph-db__diff.is-up {
+  background: var(--pink-tint);
+}
+
+.ph-db__diff.is-down {
+  background: var(--blue-tint);
+}
+
+.ph-db--total .ph-db__diff {
+  background: var(--surface);
+}
+
+.ph-db__none {
+  grid-column: 2 / -1;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+.ph-db.is-missing .ph-db__label {
+  color: var(--ink-2);
+}
+
+.ph-db__track {
+  position: relative;
+  height: 22px;
+  margin: 0 8px;
+}
+
+.ph-db__track::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 4px;
+  margin-top: -2px;
+  border-radius: 2px;
+  background: var(--surface-3);
+}
+
+.ph-db__ticks span {
+  position: absolute;
+  top: 50%;
+  width: 2px;
+  height: 10px;
+  margin: -5px 0 0 -1px;
+  border-radius: 1px;
+  background: var(--surface-3);
+}
+
+.ph-db__link {
+  position: absolute;
+  top: 50%;
+  height: 6px;
+  margin-top: -3px;
+  border-radius: 3px;
+  background: rgb(var(--ink-rgb) / 0.28);
+}
+
+.ph-db__dot {
+  position: absolute;
+  top: 50%;
+  width: 16px;
+  height: 16px;
+  margin: -8px 0 0 -8px;
+  border-radius: 50%;
+  border: 3px solid var(--surface);
+}
+
+.ph-db--total .ph-db__dot {
+  border-color: var(--surface-2);
+}
+
+.ph-db__dot--before {
+  background: var(--pink-deep);
+}
+
+.ph-db__dot--after {
+  background: var(--blue-deep);
+}
+
+.ph-db__dot--static {
+  position: static;
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin: 0 4px 0 0;
+  border: 0;
+  vertical-align: -1px;
+}
+
+/* Period by period: a card that opens */
+
+.ph-card.ph-details {
+  padding: 0;
+}
+
+.ph-details__summary {
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 20px;
+  font-weight: 600;
+  list-style: none;
+  cursor: pointer;
+  border-radius: var(--radius-lg);
+}
+
+.ph-details__summary::-webkit-details-marker {
+  display: none;
+}
+
+.ph-details[open] .ph-details__chev {
+  transform: rotate(90deg);
+}
+
+.ph-pairs {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 20px 16px;
+}
+
+.ph-pairs__item {
+  display: flex;
+  gap: 12px;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.ph-pairs__date {
+  flex: none;
+  min-width: 52px;
+  font-weight: 600;
+}
+
+.ph-pairs__item.is-skipped .ph-pairs__what {
+  color: var(--ink-2);
+}
+
+/* ---------- Heat grids (mood by phase, symptoms by phase, levels) ---------- */
+
+.ph-heat-wrap {
+  margin: 0 -4px;
+}
+
+.ph-heat {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 3px;
+}
+
+.ph-heat__corner {
+  width: 38%;
+}
+
+.ph-heat--body .ph-heat__corner,
+.ph-heat--levels .ph-heat__corner {
+  width: 30%;
+}
+
+.ph-heat__phase {
+  padding: 0 0 2px;
+  font-weight: 600;
+}
+
+.ph-heat__pill {
+  display: block;
+  padding: 3px 0;
+  border-radius: 999px;
+  background: var(--tone);
+  color: var(--tone-on);
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.ph-heat__pill--all {
+  background: var(--surface-3);
+  color: var(--ink);
+}
+
+.ph-heat__row {
+  padding-right: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.2;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+
+.ph-heat__total .ph-heat__row {
+  font-weight: 700;
+}
+
+.ph-heat__cell {
+  padding: 0;
+  text-align: center;
+}
+
+.ph-heat__val,
+.ph-heat__cell.is-empty > span[aria-hidden] {
+  display: block;
+  height: 30px;
+  line-height: 30px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.ph-heat__val--pct {
+  font-size: 12px;
+}
+
+.ph-heat__cell.is-zero .ph-heat__val {
+  color: var(--ink-2);
+  font-weight: 500;
+}
+
+.ph-heat__cell.is-empty > span[aria-hidden] {
+  background: var(--surface-2);
+  color: var(--ink-2);
+}
+
+.ph-heat__total .ph-heat__val {
+  font-weight: 700;
+}
+
+.ph-heat__cell.is-thin > span[aria-hidden],
+.ph-heat__cell.is-thin .ph-heat__val {
+  outline: 1.5px dashed var(--ink-2);
+  outline-offset: -3px;
+}
+
+.ph-heat__days {
+  padding-top: 2px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--ink-2);
+}
+
+tfoot .ph-heat__row {
+  font-size: 12px;
+  color: var(--ink-2);
+}
+
+/* Sleep / energy / cravings: one small stacked column per phase, lightest level at the bottom */
+
+.ph-lv-key {
+  display: flex;
+  flex-direction: column;
+  margin-top: 2px;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.25;
+  color: var(--ink-2);
+}
+
+.ph-lv-key > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ph-lv-sw {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+}
+
+.ph-lv-cell {
+  height: 1px; /* lets the column fill the row height */
+  padding: 0 4px;
+  vertical-align: bottom;
+}
+
+.ph-lv-cell.is-thin {
+  opacity: 0.5;
+}
+
+.ph-lv {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 2px;
+  height: 100%;
+  min-height: 44px;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.ph-lv__seg {
+  flex-shrink: 1;
+  display: block;
+  width: 100%;
+}
+
+.ph-lv-none {
+  display: block;
+  font-size: 13px;
+  text-align: center;
+  color: var(--ink-2);
+}
+
+.ph-lvl-0 {
+  background: var(--lvl-0);
+}
+.ph-lvl-1 {
+  background: var(--lvl-1);
+}
+.ph-lvl-2 {
+  background: var(--lvl-2);
+}
+
+/* A mood that was never rated (mood tracking off or at a lower level): one quiet pill across the row. */
+.ph-heat__none {
+  display: block;
+  height: 30px;
+  line-height: 30px;
+  border-radius: 10px;
+  background: var(--surface-2);
+  color: var(--ink-2);
+  font-size: 12px;
+}

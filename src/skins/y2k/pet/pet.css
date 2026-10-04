@@ -1,0 +1,479 @@
+/* ==========================================================================
+   Keychain virtual pet: PetView (src/skins/y2k/PetView.tsx), PetDevice and PetSprite
+   (src/skins/y2k/pet/). Every class is prefixed `tama-` / `tama__` so it never
+   collides with the app theme. Motion lives only inside
+   `prefers-reduced-motion: no-preference`; without it every sprite shows frame A.
+   ========================================================================== */
+
+/* ---------- Sprite (reusable anywhere; draws in currentColor) ---------- */
+
+.tama-sprite {
+  --tama-beat: 1s;
+  --tama-badge-beat: 1s;
+  display: block;
+  overflow: visible;
+}
+.tama-sprite--egg { --tama-beat: 1.4s; }
+.tama-sprite--sad { --tama-beat: 1.8s; --tama-badge-beat: 0.9s; }
+.tama-sprite--sick { --tama-beat: 1.2s; --tama-badge-beat: 1.2s; }
+.tama-sprite--critical { --tama-beat: 2.4s; --tama-badge-beat: 0.6s; }
+.tama-sprite--dead { --tama-beat: 1.2s; }
+
+.tama-sprite__frame--b {
+  opacity: 0;
+}
+
+/* Poses (not motion): sad and critical pets slump one pixel. */
+.tama-sprite--sad .tama-sprite__pose,
+.tama-sprite--critical .tama-sprite__pose {
+  transform: translateY(1px); /* 1px = one sprite pixel inside the SVG */
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .tama-sprite__frame--a {
+    animation: tama-frame-a var(--tama-beat) steps(1, end) infinite;
+  }
+  .tama-sprite__frame--b {
+    animation: tama-frame-b var(--tama-beat) steps(1, end) infinite;
+  }
+  .tama-sprite__badge .tama-sprite__frame {
+    animation-duration: var(--tama-badge-beat);
+  }
+
+  /* happy: hop on frame A, land on frame B */
+  .tama-sprite--happy .tama-sprite__move {
+    animation: tama-hop var(--tama-beat) steps(1, end) infinite;
+  }
+  /* a happy egg rocks side to side instead */
+  .tama-sprite--happy.tama-sprite--egg .tama-sprite__move {
+    animation-name: tama-rock;
+  }
+  /* sick: queasy shiver */
+  .tama-sprite--sick .tama-sprite__move {
+    animation: tama-shiver 0.5s steps(1, end) infinite;
+  }
+  /* critical: pixels flicker out */
+  .tama-sprite--critical .tama-sprite__move {
+    animation: tama-flicker 2.6s steps(1, end) infinite;
+  }
+  /* dead: the little ghost floats */
+  .tama-sprite--dead .tama-sprite__move {
+    animation: tama-float 2.4s steps(1, end) infinite;
+  }
+}
+
+@keyframes tama-frame-a {
+  0% { opacity: 1; }
+  50% { opacity: 0; }
+  100% { opacity: 0; }
+}
+@keyframes tama-frame-b {
+  0% { opacity: 0; }
+  50% { opacity: 1; }
+  100% { opacity: 1; }
+}
+@keyframes tama-hop {
+  0% { transform: translateY(-1px); }
+  50% { transform: translateY(0); }
+  100% { transform: translateY(0); }
+}
+@keyframes tama-rock {
+  0% { transform: translateX(-1px); }
+  50% { transform: translateX(1px); }
+  100% { transform: translateX(1px); }
+}
+@keyframes tama-shiver {
+  0% { transform: translateX(-1px); }
+  50% { transform: translateX(1px); }
+  100% { transform: translateX(1px); }
+}
+@keyframes tama-flicker {
+  0% { opacity: 1; }
+  62% { opacity: 0.2; }
+  66% { opacity: 1; }
+  80% { opacity: 0.35; }
+  83% { opacity: 1; }
+  100% { opacity: 1; }
+}
+@keyframes tama-float {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-1px); }
+  100% { transform: translateY(-1px); }
+}
+@keyframes tama-blink {
+  0% { opacity: 1; }
+  50% { opacity: 0.12; }
+  100% { opacity: 0.12; }
+}
+@keyframes tama-swing {
+  from { transform: rotate(-7deg); }
+  to { transform: rotate(7deg); }
+}
+
+/* Small LCD icons */
+.tama-icon {
+  display: block;
+  flex: none;
+}
+.tama-icon--off {
+  opacity: 0.13;
+}
+
+/* ---------- Layout ---------- */
+
+.tama {
+  --tama-pink: #ff3ea5;
+  --tama-pink-deep: #b3105f;
+  --tama-ink: #3b0d2e;
+  --tama-lcd-ink: #232c1d;
+  --tama-bubble: #fffafd;
+  container: tama / inline-size;
+  box-sizing: border-box;
+  width: 100%; /* size containment: never let the width collapse to its (ignored) content */
+  margin: 10px 0;
+  padding: 4px 0 8px;
+  min-width: 0;
+  max-width: 100%;
+  color: var(--tama-ink);
+}
+
+.tama__scene {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px 12px;
+}
+
+.tama__side {
+  flex: 1 1 140px;
+  min-width: 0;
+  max-width: 210px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Narrow column: stack the bubble and tag under the toy. */
+@container tama (max-width: 319px) {
+  .tama__scene {
+    flex-direction: column;
+  }
+  .tama__side {
+    flex-basis: auto;
+    width: 100%;
+    max-width: 240px;
+  }
+  .tama__bubble-tail {
+    display: none;
+  }
+}
+
+/* ---------- The toy ---------- */
+
+.tama__device {
+  position: relative;
+  flex: none;
+  width: 160px;
+  margin: 0 6px;
+  transform: rotate(-4deg);
+  filter: drop-shadow(0 8px 9px rgba(110, 0, 60, 0.3));
+}
+
+.tama__chain {
+  position: relative;
+  z-index: 0;
+  display: block;
+  margin: 0 auto -7px;
+  overflow: visible;
+}
+.tama__charm--heart { transform-origin: 34.5px 12px; }
+.tama__charm--star { transform-origin: 45.5px 12px; animation-delay: -1.3s; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .tama__charm {
+    animation: tama-swing 2.6s ease-in-out infinite alternate;
+  }
+  .tama__alarm {
+    animation: tama-blink 0.6s steps(1, end) infinite;
+  }
+}
+
+.tama__shell {
+  position: relative;
+  z-index: 1;
+  width: 160px;
+  height: 188px;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  background:
+    /* specular highlight */
+    radial-gradient(ellipse 34% 20% at 30% 17%, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0) 70%),
+    radial-gradient(ellipse 14% 30% at 88% 58%, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0) 70%),
+    /* glitter */
+    radial-gradient(circle at 30% 40%, rgba(255, 255, 255, 0.95) 0 0.7px, transparent 1.3px) 0 0 / 11px 13px,
+    radial-gradient(circle at 70% 60%, rgba(255, 226, 246, 0.85) 0 0.6px, transparent 1.2px) 4px 6px / 9px 10px,
+    radial-gradient(circle at 50% 50%, rgba(214, 196, 255, 0.9) 0 0.5px, transparent 1.1px) 2px 3px / 7px 8px,
+    /* translucent hot-pink plastic */
+    radial-gradient(ellipse at 42% 36%, #ff9ad6 0%, #ff4fb0 42%, #ec2490 72%, #b8126f 100%);
+  box-shadow:
+    inset 0 -14px 20px rgba(120, 0, 60, 0.38),
+    inset 0 10px 14px rgba(255, 255, 255, 0.45),
+    inset 0 0 0 1.5px rgba(255, 255, 255, 0.3),
+    0 5px 0 var(--tama-pink-deep);
+}
+
+/* the tab the ball chain loops through */
+.tama__shell::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: -9px;
+  width: 18px;
+  height: 15px;
+  margin-left: -9px;
+  border-radius: 9px 9px 4px 4px;
+  background:
+    radial-gradient(circle at 50% 42%, transparent 0 2.6px, rgba(120, 0, 60, 0.45) 3px, transparent 3.8px),
+    linear-gradient(#ff7cc6, #e8288f);
+  -webkit-mask: radial-gradient(circle at 50% 42%, transparent 0 2.6px, #000 3px);
+  mask: radial-gradient(circle at 50% 42%, transparent 0 2.6px, #000 3px);
+}
+
+.tama__gem,
+.tama__decal {
+  position: absolute;
+  pointer-events: none;
+}
+.tama__gem {
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 34% 30%, #fff 0 18%, rgba(255, 255, 255, 0) 36%),
+    conic-gradient(from 20deg, #ffffff, #f7b8e8, #ffffff, #c9b6ff, #ffffff, #b6e3ff, #ffffff, #ffc4ec, #ffffff);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.75),
+    0 1px 1.5px rgba(90, 0, 50, 0.45);
+}
+.tama__decal {
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  background: linear-gradient(135deg, #ffffff 0%, #d7c6ff 30%, #ffc6ea 55%, #bfe6ff 78%, #ffffff 100%);
+}
+
+.tama__bezel {
+  position: absolute;
+  left: 50%;
+  top: 26px;
+  width: 108px;
+  height: 108px;
+  margin-left: -54px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 20px 20px 26px 26px;
+  background: linear-gradient(140deg, #fefbff 0%, #dccbff 22%, #ffd3ef 42%, #c8e6ff 62%, #e9ddff 80%, #ffffff 100%);
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -2px 3px rgba(110, 70, 160, 0.3),
+    0 0 0 1.5px rgba(150, 20, 90, 0.35),
+    0 2px 3px rgba(110, 0, 60, 0.35);
+}
+
+.tama__lcd {
+  position: relative;
+  box-sizing: border-box;
+  width: 94px;
+  height: 94px;
+  padding: 4px 4px 3px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  overflow: hidden;
+  border-radius: 9px;
+  color: var(--tama-lcd-ink);
+  background:
+    linear-gradient(rgba(35, 44, 29, 0.05) 1px, transparent 1px) 0 0 / 3px 3px,
+    linear-gradient(90deg, rgba(35, 44, 29, 0.05) 1px, transparent 1px) 0 0 / 3px 3px,
+    radial-gradient(ellipse at 30% 20%, #dbe5c8, #bfcca7 70%, #adbc95);
+  box-shadow:
+    inset 0 3px 5px rgba(0, 0, 0, 0.32),
+    inset 0 0 0 1.5px rgba(40, 55, 30, 0.45);
+}
+/* glare across the glass */
+.tama__lcd::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(118deg, rgba(255, 255, 255, 0.38) 0 16%, rgba(255, 255, 255, 0) 30%);
+}
+.tama__lcd .tama-sprite,
+.tama__lcd .tama-icon {
+  /* LCD pixels cast a faint shadow on the backplane */
+  filter: drop-shadow(0.75px 1.25px 0 rgba(35, 44, 29, 0.2));
+}
+.tama--dead .tama__lcd {
+  filter: saturate(0.6) brightness(0.96);
+}
+
+.tama__lcd-row {
+  width: 100%;
+  height: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2px;
+  box-sizing: border-box;
+}
+.tama__hearts {
+  display: flex;
+  gap: 2px;
+}
+.tama__readout {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-family: 'VT323', 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 10px;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.tama__brand {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 135px;
+  text-align: center;
+  font-family: 'Pacifico', 'Brush Script MT', cursive;
+  font-size: 12px;
+  line-height: 14px;
+  color: #fff;
+  text-shadow: 0 1px 0 var(--tama-pink-deep);
+  white-space: nowrap;
+}
+
+.tama__buttons {
+  position: absolute;
+  left: 50%;
+  top: 152px;
+  width: 0;
+  height: 0;
+}
+.tama__button {
+  position: absolute;
+  top: 0;
+  width: 16px;
+  height: 16px;
+  margin-left: -8px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 36% 30%, #ffffff 0 10%, #ffe1f3 26%, #f7a6d6 66%, #d873b0 100%);
+  box-shadow:
+    0 0 0 2.5px rgba(140, 10, 75, 0.35),
+    0 2px 0 2.5px rgba(255, 255, 255, 0.25),
+    inset 0 -2px 3px rgba(150, 30, 100, 0.35),
+    0 1.5px 1px rgba(90, 0, 50, 0.4);
+}
+.tama__button:nth-child(1) { left: -30px; }
+.tama__button:nth-child(2) { left: 0; top: 5px; }
+.tama__button:nth-child(3) { left: 30px; }
+
+/* ---------- Speech bubble ---------- */
+
+.tama__bubble {
+  position: relative;
+  margin: 0 3px;
+  padding: 5px 8px 6px;
+  background: var(--tama-bubble);
+  color: var(--tama-ink);
+  font-family: 'VT323', 'Courier New', monospace;
+  font-size: 18px;
+  line-height: 1.05;
+  overflow-wrap: break-word;
+  /* pixel border: four offset copies leave the corners notched */
+  box-shadow:
+    0 -3px 0 var(--tama-ink),
+    0 3px 0 var(--tama-ink),
+    -3px 0 0 var(--tama-ink),
+    3px 0 0 var(--tama-ink);
+  filter: drop-shadow(3px 3px 0 rgba(255, 62, 165, 0.55));
+}
+.tama__bubble-tail {
+  position: absolute;
+  left: -12px;
+  top: 9px;
+  display: block;
+}
+.tama__bubble-tail-ink { fill: var(--tama-ink); }
+.tama__bubble-tail-fill { fill: var(--tama-bubble); }
+
+/* ---------- Name tag ---------- */
+
+.tama__tag {
+  position: relative;
+  margin: 0 4px 0 2px;
+  padding: 7px 10px 8px 24px;
+  border: 2px solid var(--tama-ink);
+  border-radius: 6px 16px 16px 6px;
+  background:
+    radial-gradient(circle at 85% 20%, rgba(255, 255, 255, 0.7) 0 6%, rgba(255, 255, 255, 0) 30%),
+    linear-gradient(135deg, #ffffff 0%, #e3e5ea 38%, #ffd6ef 68%, #d6ebff 100%);
+  box-shadow: 3px 3px 0 rgba(255, 62, 165, 0.55);
+  transform: rotate(2deg);
+}
+/* the eyelet */
+.tama__tag::before {
+  content: '';
+  position: absolute;
+  left: 7px;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  margin-top: -6px;
+  border-radius: 50%;
+  border: 2px solid #9a95ad;
+  background: var(--tama-bubble);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.25);
+}
+
+.tama__name {
+  margin: 0;
+  font-family: 'Bagel Fat One', 'Arial Rounded MT Bold', system-ui, sans-serif;
+  font-size: 21px;
+  font-weight: 400;
+  line-height: 1.05;
+  color: var(--tama-pink);
+  text-shadow: 1.5px 1.5px 0 var(--tama-ink);
+  overflow-wrap: anywhere;
+}
+
+.tama__stats {
+  margin: 6px 0 0;
+  display: grid;
+  gap: 2px;
+}
+.tama__stats > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+.tama__stats dt {
+  font-family: 'Silkscreen', 'Courier New', monospace;
+  font-size: 12px;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  opacity: 0.8;
+}
+.tama__stats dd {
+  margin: 0;
+  font-family: 'VT323', 'Courier New', monospace;
+  font-size: 17px;
+  line-height: 1;
+  text-align: right;
+}
+.tama--sad .tama__status { color: #5b4fc4; }
+.tama--sick .tama__status { color: #b5307a; }
+.tama--critical .tama__status { color: #d0003a; }
+.tama--dead .tama__status { color: #6d6680; }

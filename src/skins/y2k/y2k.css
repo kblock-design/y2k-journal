@@ -1,0 +1,3203 @@
+/*
+ * THE BURN BOOK — Y2K chrome / McBling desktop theme.
+ *
+ * Everything is drawn in code: gradients, box-shadow bevels, inline SVG and the bundled
+ * fonts (imported in index.tsx). Every colour, font, size, radius and shadow is a custom
+ * property on :root; components only use class names.
+ *
+ * Visual system
+ *  - The page is a "desktop" (silver chrome by default; six louder looks in Settings) with
+ *    a few stickers peeking out from behind the windows (Desktop.tsx).
+ *  - Each section is an old-computer window (.win): silver bevelled frame, black / liquid
+ *    chrome / hot pink / holo title bar with _ □ ×, optional menu and status bars. Text always
+ *    sits on the near-white window surface.
+ *  - Black ink, chrome and hot pink lead; baby pink is a minor accent. Secondary buttons are
+ *    chrome keys, the primary action is a glossy hot-pink pill, selected = pressed in + hot
+ *    pink (or black).
+ *  - Fonts: Silkscreen (pixel: titles, labels, buttons; never below 12px), VT323 (terminal:
+ *    body copy, used large), Bagel Fat One (bubble: big numbers, headlines), Pacifico (script).
+ */
+
+:root {
+  /* ---------- Core palette ---------- */
+  --ink: #141218; /* text and outlines */
+  --ink-soft: #4a4652; /* muted text, ≥ 6.5:1 on every window surface */
+  --pink-hot: #ff2e93;
+  --pink-deep: #d6127a; /* hot pink that can carry white text (≈4.8:1) and sits on white as text (≈5:1) */
+  --pink-bubblegum: #ff8cc6;
+  --pink-baby: #ffc8e3;
+  --pink-blush: #ffe6f2;
+  --pink-milk: #fff7fb;
+  --lilac: #c9a7ff;
+  --lilac-deep: #8a4fe0;
+  --lilac-soft: #efe4ff;
+  --periwinkle: #8fa8ff;
+  --periwinkle-deep: #3f55d8;
+  --periwinkle-soft: #e1e8ff;
+  --mint: #9ff0cf;
+  --mint-soft: #dcfbef;
+  --butter: #fff3a6;
+  --cherry: #d4004a;
+  --white: #ffffff;
+  /* Legacy names: "plum" was the old ink. */
+  --plum: var(--ink);
+  --plum-soft: var(--ink-soft);
+
+  /* Chrome ramp */
+  --chrome-50: #ffffff;
+  --chrome-100: #f3f4f7;
+  --chrome-200: #e3e5ea;
+  --chrome-300: #c8cbd2;
+  --chrome-400: #a3a7b1;
+  --chrome-500: #7c808b;
+  --chrome-600: #555963;
+  --chrome-700: #33363d;
+  --chrome-900: #0e0d11;
+  /* A bevelled chrome key (buttons, tabs, window controls) */
+  --chrome-key: linear-gradient(180deg, #ffffff 0%, #f0f1f4 40%, #d5d8de 54%, #e6e8ec 80%, #f7f8fa 100%);
+  /* Liquid chrome with a dark horizon line (wordmark, accents) */
+  --chrome-liquid: linear-gradient(
+    180deg,
+    #ffffff 0%,
+    #eef0f3 26%,
+    #b8bcc5 46%,
+    #50545e 51%,
+    #8f949e 64%,
+    #e3e6ea 84%,
+    #ffffff 100%
+  );
+
+  /* Window chrome */
+  --win-face: #d5d7dd;
+  --win-surface: #fcfcfd;
+  --bevel-hi: #ffffff;
+  --bevel-lo: #8c909a;
+  --bevel-dark: #2b2d33;
+  --win-outline: var(--ink);
+
+  /* Title bar finishes */
+  --titlebar-black: linear-gradient(90deg, #0b0a0e 0%, #1d1b22 50%, #3a3842 100%);
+  --titlebar-chrome: linear-gradient(180deg, #ffffff 0%, #eceef1 40%, #c9ccd3 56%, #dfe1e6 80%, #f4f5f7 100%);
+  --titlebar-hot: linear-gradient(90deg, #a1085a 0%, #c40f70 50%, #d81884 100%);
+  --titlebar-holo: linear-gradient(
+    100deg,
+    #ffd9f0 0%,
+    #e4d8ff 24%,
+    #d0ebff 48%,
+    #d9fbef 68%,
+    #f6f0ff 84%,
+    #ffdcef 100%
+  );
+  --titlebar-error: linear-gradient(90deg, #8f0020 0%, #c70036 60%, #e01e4f 100%);
+
+  /* Holographic + chrome finishes */
+  --holo: linear-gradient(
+    115deg,
+    #ffd1ec 0%,
+    #d9c7ff 20%,
+    #c4e3ff 40%,
+    #d6ffef 55%,
+    #fff1c9 70%,
+    #ffc9e6 85%,
+    #e4c9ff 100%
+  );
+  --chrome-text: var(--chrome-liquid);
+
+  /* Legacy semantic tokens (kept so any component can still use them) */
+  --color-bg: var(--chrome-100);
+  --color-surface: var(--win-surface);
+  --color-surface-alt: var(--chrome-100);
+  --color-border: var(--bevel-lo);
+  --color-border-strong: var(--ink);
+  --color-text: var(--ink);
+  --color-text-muted: var(--ink-soft);
+  --color-text-inverse: var(--white);
+  --color-accent: var(--pink-deep);
+  --color-accent-soft: var(--pink-blush);
+  --color-accent-text: var(--white);
+  --color-danger: var(--cherry);
+  --color-success: #0b7046;
+  --color-backdrop: rgba(14, 13, 17, 0.6);
+  --color-focus: #2433ff;
+
+  /* Cycle phases (actual) and lighter predicted versions */
+  --phase-menstrual: #ff8cc3;
+  --phase-follicular: #a9bdff;
+  --phase-ovulation: #8fe8c6;
+  --phase-luteal: #d0b4ff;
+  --phase-menstrual-predicted: #ffdbeb;
+  --phase-follicular-predicted: #e2e9ff;
+  --phase-ovulation-predicted: #d9f8ec;
+  --phase-luteal-predicted: #f0e7ff;
+  --phase-predicted-border: #6f7380;
+  --phase-predicted-hatch: repeating-linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.85) 0 3px,
+    transparent 3px 7px
+  );
+
+  /* Calendar marks */
+  --color-flow: var(--cherry);
+  --color-logged-dot: var(--ink);
+  --color-today-ring: var(--pink-deep);
+  --color-selected-ring: var(--ink);
+
+  /* ---------- Typography ---------- */
+  --font-pixel: 'Silkscreen', 'Courier New', monospace;
+  --font-body: 'VT323', 'Courier New', monospace;
+  --font-display: 'Bagel Fat One', 'Arial Rounded MT Bold', sans-serif;
+  --font-script: 'Pacifico', 'Brush Script MT', cursive;
+
+  /* VT323 runs small, so body sizes are large */
+  --font-size-xs: 18px;
+  --font-size-sm: 20px;
+  --font-size-md: 22px;
+  --font-size-lg: 26px;
+  --font-size-xl: 32px;
+  --font-size-pet: 2.25rem;
+  /* Silkscreen sizes (12px is the floor for any text) */
+  --pixel-xs: 12px;
+  --pixel-sm: 12px;
+  --pixel-md: 13px;
+  --pixel-lg: 15px;
+  --font-weight-normal: 400;
+  --font-weight-bold: 700;
+  --line-height: 1.12;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+
+  /* Shape */
+  --radius-sm: 3px;
+  --radius-md: 6px;
+  --radius-lg: 20px;
+  --radius-pill: 999px;
+  --border-width: 2px;
+
+  /* Bevels & elevation */
+  --bevel-out: inset -2px -2px 0 var(--bevel-dark), inset 2px 2px 0 var(--bevel-hi),
+    inset -4px -4px 0 var(--bevel-lo), inset 4px 4px 0 #eef0f3;
+  --bevel-in: inset 2px 2px 0 var(--bevel-lo), inset -2px -2px 0 var(--bevel-hi),
+    inset 3px 3px 0 rgba(20, 18, 24, 0.18);
+  --bevel-btn: inset -3px -3px 0 rgba(90, 94, 104, 0.55), inset 3px 3px 0 rgba(255, 255, 255, 0.95);
+  --bevel-btn-pressed: inset 3px 3px 0 rgba(20, 18, 24, 0.45), inset -2px -2px 0 rgba(255, 255, 255, 0.3);
+  --drop-hard: 3px 3px 0 var(--ink);
+  --drop-window: 5px 6px 0 rgba(20, 18, 24, 0.78);
+  --shadow-card: var(--drop-hard);
+  --shadow-raised: 0 -2px 0 var(--ink);
+  --shadow-sheet: var(--drop-window);
+  --text-outline: 1px 1px 0 var(--ink), -1px -1px 0 var(--ink), 1px -1px 0 var(--ink),
+    -1px 1px 0 var(--ink), 2px 2px 0 var(--ink);
+
+  /* Layout */
+  --app-max-width: 430px;
+  --tap-min: 44px;
+  --tabbar-height: 64px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+
+  color-scheme: light;
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: var(--line-height);
+  color: var(--color-text);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* ---------- Base ---------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* ---------- Desktop backgrounds ----------
+   Picked in Settings (prefs.ts) and keyed by data-bg on <html>; the same tokens paint the
+   Settings swatches (.bg-swatch[data-bg]). Every look is a stack of small repeating
+   gradient tiles plus at most a few full-page washes: no images, no blur, no fixed
+   attachment. Windows keep their own light surfaces on all of them.
+   Pixel rectangles use conic-gradient(from 270deg at W H, colour 25%, transparent 0):
+   that paints the top-left W x H corner of each tile, and background-position places it. */
+
+/* Silver (default): brushed off-white to soft silver, a faint pixel grid, sparse white glints
+   and the odd hot-pink fleck, with a holographic sheen across the top right and bottom left
+   and one diagonal foil band. Neutral enough that windows and stickers do the talking. */
+:root,
+[data-bg='chrome'] {
+  --desktop-bg-color: #e6e8ed;
+  --desktop-bg-image:
+    radial-gradient(circle, #fff 0 1.1px, transparent 1.7px),
+    radial-gradient(circle, rgba(255, 46, 147, 0.4) 0 0.9px, transparent 1.5px),
+    linear-gradient(rgba(20, 18, 24, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(20, 18, 24, 0.05) 1px, transparent 1px),
+    radial-gradient(ellipse 75% 32% at 100% 0%, rgba(255, 150, 210, 0.22), rgba(200, 170, 255, 0.12) 45%, transparent 70%),
+    radial-gradient(ellipse 85% 36% at 0% 100%, rgba(140, 205, 255, 0.22), rgba(190, 255, 230, 0.12) 45%, transparent 70%),
+    linear-gradient(
+      118deg,
+      transparent 28%,
+      rgba(255, 140, 205, 0.12) 38%,
+      rgba(175, 155, 255, 0.12) 44%,
+      rgba(130, 215, 255, 0.12) 50%,
+      rgba(255, 255, 255, 0.35) 54%,
+      transparent 62%
+    ),
+    linear-gradient(180deg, #f7f8fa 0%, #e9ebef 40%, #dcdfe5 100%);
+  --desktop-bg-size: 53px 47px, 97px 89px, 24px 24px, 24px 24px, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
+  --desktop-bg-position: 7px 11px, 41px 29px, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0;
+}
+
+/* Pink glitter: tiny dots, a faint pixel grid and a holo wash. */
+[data-bg='glitter'] {
+  --desktop-bg-color: #ffb6da;
+  --desktop-bg-image:
+    radial-gradient(circle, #fff 0 1px, transparent 1.6px),
+    radial-gradient(circle, rgba(255, 255, 255, 0.95) 0 1.4px, transparent 2.2px),
+    radial-gradient(circle, rgba(170, 120, 255, 0.85) 0 1.2px, transparent 2px),
+    radial-gradient(circle, rgba(214, 18, 122, 0.45) 0 1px, transparent 1.7px),
+    radial-gradient(circle, rgba(120, 160, 255, 0.7) 0 1px, transparent 1.7px),
+    linear-gradient(rgba(255, 255, 255, 0.28) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.28) 1px, transparent 1px),
+    linear-gradient(165deg, #ff9fcf 0%, #ffc4e2 22%, #f0c6ff 42%, #ffb3da 60%, #d6cbff 80%, #ffa8d4 100%);
+  --desktop-bg-size: 23px 29px, 67px 53px, 41px 47px, 31px 37px, 59px 71px, 24px 24px, 24px 24px, 100% 100%;
+  --desktop-bg-position: 0 0, 11px 17px, 5px 23px, 19px 3px, 37px 41px, 0 0, 0 0, 0 0;
+}
+
+/* Holo swirl: rainbow foil rings from the top-left corner, crossed by soft white and
+   pink/aqua rings from two other centres (the interference reads as a swirl), with
+   white, pink, teal and gold glitter on top. */
+[data-bg='holo'] {
+  --desktop-bg-color: #f6c3ec;
+  --desktop-bg-image:
+    radial-gradient(circle, #fff 0 1px, transparent 1.6px),
+    radial-gradient(circle, rgba(255, 255, 255, 0.95) 0 1.4px, transparent 2.2px),
+    radial-gradient(circle, rgba(255, 70, 160, 0.75) 0 1px, transparent 1.7px),
+    radial-gradient(circle, rgba(30, 180, 175, 0.7) 0 1px, transparent 1.7px),
+    radial-gradient(circle, rgba(255, 185, 30, 0.85) 0 1px, transparent 1.7px),
+    repeating-radial-gradient(
+      circle at 100% 35%,
+      rgba(255, 255, 255, 0) 0,
+      rgba(255, 255, 255, 0.45) 50px,
+      rgba(255, 255, 255, 0) 100px,
+      rgba(130, 70, 220, 0.1) 150px,
+      rgba(255, 255, 255, 0) 200px
+    ),
+    repeating-radial-gradient(
+      circle at 10% 100%,
+      rgba(255, 110, 190, 0) 0,
+      rgba(255, 110, 190, 0.22) 80px,
+      rgba(110, 220, 255, 0) 160px,
+      rgba(110, 220, 255, 0.22) 240px,
+      rgba(255, 110, 190, 0) 320px
+    ),
+    repeating-radial-gradient(
+      circle at 0 0,
+      #ff9ad5 0,
+      #c9a3ff 70px,
+      #93c4ff 140px,
+      #9ef5df 210px,
+      #fff1a1 280px,
+      #ffb6a0 350px,
+      #ff9ad5 420px
+    );
+  --desktop-bg-size: 19px 23px, 61px 53px, 37px 43px, 47px 41px, 53px 59px, 100% 100%, 100% 100%, 100% 100%;
+  --desktop-bg-position: 0 0, 9px 13px, 4px 21px, 23px 7px, 31px 37px, 0 0, 0 0, 0 0;
+}
+
+/* Retro desktop: periwinkle sky gradient, a 2px checker dither, a 48px grid and a
+   scatter of pixel plus-sign sparkles. */
+[data-bg='desktop'] {
+  --desktop-bg-color: #97adf5;
+  --desktop-bg-image:
+    conic-gradient(from 270deg at 2px 6px, #fff 25%, transparent 0),
+    conic-gradient(from 270deg at 6px 2px, #fff 25%, transparent 0),
+    conic-gradient(from 270deg at 2px 6px, #ffe3f4 25%, transparent 0),
+    conic-gradient(from 270deg at 6px 2px, #ffe3f4 25%, transparent 0),
+    conic-gradient(
+      rgba(255, 255, 255, 0.16) 0 25%,
+      transparent 0 50%,
+      rgba(255, 255, 255, 0.16) 0 75%,
+      transparent 0
+    ),
+    linear-gradient(rgba(255, 255, 255, 0.24) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.24) 1px, transparent 1px),
+    linear-gradient(180deg, #8aa2f2 0%, #a6b9ff 45%, #bdb6ff 100%);
+  --desktop-bg-size: 120px 104px, 120px 104px, 168px 152px, 168px 152px, 4px 4px, 48px 48px, 48px 48px, 100% 100%;
+  --desktop-bg-position: 44px 30px, 42px 32px, 120px 96px, 118px 98px, 0 0, 0 0, 0 0, 0 0;
+}
+
+/* Lilac sky: dusk gradient with two stepped pixel clouds per 300 x 260 tile (8px and 6px
+   "pixels", lilac underside) and white / butter pixel stars. */
+[data-bg='sky'] {
+  --desktop-bg-color: #bba5ff;
+  --desktop-bg-image:
+    conic-gradient(from 270deg at 40px 8px, #fff 25%, transparent 0),
+    conic-gradient(from 270deg at 80px 8px, #fff 25%, transparent 0),
+    conic-gradient(from 270deg at 104px 16px, #fff 25%, transparent 0),
+    conic-gradient(from 270deg at 88px 8px, #e4d6ff 25%, transparent 0),
+    conic-gradient(from 270deg at 30px 6px, #fff 25%, transparent 0),
+    conic-gradient(from 270deg at 60px 6px, #fff 25%, transparent 0),
+    conic-gradient(from 270deg at 78px 12px, #fff 25%, transparent 0),
+    conic-gradient(from 270deg at 66px 6px, #e4d6ff 25%, transparent 0),
+    conic-gradient(from 270deg at 2px 6px, #fff 25%, transparent 0),
+    conic-gradient(from 270deg at 6px 2px, #fff 25%, transparent 0),
+    conic-gradient(from 270deg at 2px 6px, #fff6b8 25%, transparent 0),
+    conic-gradient(from 270deg at 6px 2px, #fff6b8 25%, transparent 0),
+    radial-gradient(circle, rgba(255, 255, 255, 0.9) 0 1px, transparent 1.6px),
+    linear-gradient(180deg, #ad94ff 0%, #c9b3ff 35%, #e8c6f7 70%, #ffd0e8 100%);
+  --desktop-bg-size:
+    300px 260px, 300px 260px, 300px 260px, 300px 260px, 300px 260px, 300px 260px, 300px 260px, 300px 260px,
+    140px 124px, 140px 124px, 196px 172px, 196px 172px, 53px 61px, 100% 100%;
+  --desktop-bg-position:
+    48px 40px, 32px 48px, 24px 56px, 32px 72px, 188px 150px, 176px 156px, 170px 162px, 176px 174px,
+    92px 14px, 90px 16px, 40px 120px, 38px 122px, 17px 9px, 0 0;
+}
+
+/* Pink leopard: five plum rosettes with hot-pink centres per 128 x 112 tile, each ring
+   broken by a base-coloured nick, plus a few solid spots, a soft holo wash and glitter. */
+[data-bg='leopard'] {
+  --desktop-bg-color: #ffb8dc;
+  --desktop-bg-image:
+    radial-gradient(circle, #fff 0 1px, transparent 1.6px),
+    radial-gradient(circle, rgba(255, 255, 255, 0.9) 0 1.3px, transparent 2px),
+    linear-gradient(165deg, rgba(255, 255, 255, 0.16), rgba(201, 167, 255, 0.16)),
+    radial-gradient(circle 4px at 35.3px 18.4px, #ffb8dc 85%, transparent 100%),
+    radial-gradient(circle 3.5px at 74.3px 26.3px, #ffb8dc 85%, transparent 100%),
+    radial-gradient(circle 4.4px at 44.9px 70.9px, #ffb8dc 85%, transparent 100%),
+    radial-gradient(circle 3.8px at 114.9px 69.1px, #ffb8dc 85%, transparent 100%),
+    radial-gradient(circle 3.5px at 31.4px 86.4px, #ffb8dc 85%, transparent 100%),
+    radial-gradient(18.7px 13.2px at 24px 24px, #ff7cc2 50%, #4a0c3c 58% 90%, transparent 96%),
+    radial-gradient(15.4px 11px at 80px 19.2px, #ff7cc2 50%, #4a0c3c 58% 90%, transparent 96%),
+    radial-gradient(19.8px 14.3px at 57.6px 65.6px, #ff7cc2 50%, #4a0c3c 58% 90%, transparent 96%),
+    radial-gradient(16.5px 12.1px at 108.8px 76.8px, #ff7cc2 50%, #4a0c3c 58% 90%, transparent 96%),
+    radial-gradient(14.3px 10.4px at 20.8px 86.4px, #ff7cc2 50%, #4a0c3c 58% 90%, transparent 96%),
+    radial-gradient(5.5px 3.8px at 97.6px 41.6px, #4a0c3c 80%, transparent 96%),
+    radial-gradient(5px 3.3px at 43.2px 102.4px, #4a0c3c 80%, transparent 96%),
+    radial-gradient(3.3px 4.4px at 6.4px 56px, #4a0c3c 80%, transparent 96%);
+  --desktop-bg-size:
+    23px 29px, 59px 53px, 100% 100%, 128px 112px, 128px 112px, 128px 112px, 128px 112px, 128px 112px, 128px 112px,
+    128px 112px, 128px 112px, 128px 112px, 128px 112px, 128px 112px, 128px 112px, 128px 112px;
+  --desktop-bg-position: 0 0, 13px 19px, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0;
+}
+
+/* Midnight: deep navy-to-plum night with a starfield, pixel sparkles and a faint grid. */
+[data-bg='midnight'] {
+  --desktop-bg-color: #170b34;
+  --desktop-bg-image:
+    conic-gradient(from 270deg at 2px 6px, #fff 25%, transparent 0),
+    conic-gradient(from 270deg at 6px 2px, #fff 25%, transparent 0),
+    conic-gradient(from 270deg at 2px 6px, #ff9ad5 25%, transparent 0),
+    conic-gradient(from 270deg at 6px 2px, #ff9ad5 25%, transparent 0),
+    radial-gradient(circle, #fff 0 0.8px, transparent 1.4px),
+    radial-gradient(circle, rgba(255, 255, 255, 0.85) 0 1.2px, transparent 2px),
+    radial-gradient(circle, rgba(201, 167, 255, 0.9) 0 1px, transparent 1.7px),
+    radial-gradient(circle, rgba(255, 140, 210, 0.8) 0 1px, transparent 1.7px),
+    linear-gradient(rgba(201, 167, 255, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(201, 167, 255, 0.07) 1px, transparent 1px),
+    linear-gradient(180deg, #120a30 0%, #1f0f45 40%, #2e0f4a 75%, #43104a 100%);
+  --desktop-bg-size:
+    150px 136px, 150px 136px, 218px 190px, 218px 190px, 41px 47px, 83px 71px, 61px 53px, 97px 109px, 32px 32px,
+    32px 32px, 100% 100%;
+  --desktop-bg-position:
+    60px 20px, 58px 22px, 150px 110px, 148px 112px, 0 0, 31px 17px, 13px 41px, 53px 7px, 0 0, 0 0, 0 0;
+}
+
+/* On the dark desktop, plum drop shadows vanish: things sitting on it get pink ones, and
+   the wordmark's plum extrusion turns pink. Windows themselves stay light. */
+:root[data-bg='midnight'] {
+  --drop-window: 5px 6px 0 rgba(255, 110, 199, 0.5);
+}
+
+:root[data-bg='midnight'] :is(.marquee, .hint--desktop, .banner, .brand .brand__word--pixel) {
+  box-shadow: 3px 3px 0 rgba(255, 110, 199, 0.6);
+}
+
+:root[data-bg='midnight'] .note {
+  box-shadow: 5px 6px 0 rgba(255, 110, 199, 0.4);
+}
+
+:root[data-bg='midnight'] .brand .brand__word--chrome {
+  filter: drop-shadow(3px 3px 0 #ff4fa3);
+}
+
+:root[data-bg='midnight'] .brand .brand__word--wordart {
+  filter: drop-shadow(1px 1px 0 #ff4fa3) drop-shadow(1px 1px 0 #ff4fa3) drop-shadow(1px 1px 0 #ff4fa3)
+    drop-shadow(1px 1px 0 #ff4fa3);
+}
+
+:root[data-bg='midnight'] .brand .cut {
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.8),
+    1.5px 2px 0 rgba(255, 110, 199, 0.7);
+}
+
+/* The black marquee needs a light edge to separate it from the night sky. */
+:root[data-bg='midnight'] .marquee {
+  border-color: var(--chrome-400);
+}
+
+html {
+  touch-action: manipulation;
+  background-color: var(--desktop-bg-color);
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  font-family: var(--font-body);
+  font-size: var(--font-size-md);
+  background-color: var(--desktop-bg-color);
+  background-image: var(--desktop-bg-image);
+  background-size: var(--desktop-bg-size);
+  background-position: var(--desktop-bg-position);
+}
+
+h1,
+h2,
+h3,
+p,
+dl,
+dd,
+ul,
+figure,
+blockquote {
+  margin: 0;
+}
+
+h1,
+h2,
+h3 {
+  font-weight: var(--font-weight-normal);
+}
+
+ul {
+  padding: 0;
+  list-style: none;
+}
+
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+button,
+[role='group'],
+.tabbar,
+.cal-grid,
+.chip,
+.segment {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: default;
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: var(--pink-hot);
+  color: var(--white);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* Pixel icon colours */
+.pixel-icon {
+  display: block;
+  flex-shrink: 0;
+  image-rendering: pixelated;
+}
+.px-k {
+  fill: var(--plum);
+}
+.px-p {
+  fill: var(--pink-hot);
+}
+.px-l {
+  fill: var(--pink-baby);
+}
+.px-w {
+  fill: var(--white);
+}
+.px-v {
+  fill: var(--lilac);
+}
+.px-b {
+  fill: var(--periwinkle);
+}
+.px-r {
+  fill: #ff2b5e;
+}
+.px-g {
+  fill: var(--chrome-200);
+}
+.px-m {
+  fill: var(--mint);
+}
+.px-y {
+  fill: var(--butter);
+}
+
+/* ---------- App shell & desktop ---------- */
+
+.app {
+  position: relative;
+  max-width: var(--app-max-width);
+  margin: 0 auto;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  overflow-x: clip;
+}
+
+.app__content {
+  position: relative;
+  min-height: 100dvh;
+}
+
+.app__main {
+  position: relative;
+  z-index: 1;
+  padding: var(--space-3) calc(var(--space-4) + var(--safe-right))
+    calc(var(--tabbar-height) + var(--safe-bottom) + var(--space-6)) calc(var(--space-4) + var(--safe-left));
+}
+
+/* Sticker collage behind the windows */
+.desktop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.desktop__sticker {
+  position: absolute;
+  line-height: 0;
+  transform: translate(-50%, -50%);
+}
+
+.twinkle {
+  position: absolute;
+  width: var(--twinkle-size, 12px);
+  height: var(--twinkle-size, 12px);
+  transform: translate(-50%, -50%);
+  /* white core, hot-pink ring, silver tips: reads on the pale and the dark desktops alike */
+  background: radial-gradient(circle, #fff 0 20%, #ff7cbf 36%, #c3c6cf 56%, #7c808b 100%);
+  clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%);
+  opacity: 0.85;
+}
+
+/* Brand wordmark + marquee */
+.brand {
+  position: relative;
+  z-index: 1;
+  padding: calc(var(--space-2) + var(--safe-top)) calc(var(--space-2) + var(--safe-right)) 0
+    calc(var(--space-2) + var(--safe-left));
+}
+
+.brand__row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+.brand__sticker {
+  flex-shrink: 0;
+}
+
+.brand__word {
+  margin: 0;
+  font-size: var(--brand-size, clamp(30px, 10vw, 40px));
+  line-height: 1.05;
+  letter-spacing: normal;
+  text-transform: none;
+  white-space: nowrap;
+}
+
+/* Chrome bubble: liquid-chrome letters, black outline, hot-pink then black extrusion */
+.brand__word--chrome {
+  font-family: var(--font-display);
+  letter-spacing: 0.01em;
+  background: var(--chrome-text);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--ink);
+  filter: drop-shadow(2px 2px 0 var(--pink-hot)) drop-shadow(1.5px 1.5px 0 var(--ink));
+}
+
+.brand__the {
+  display: inline-block;
+  font-family: var(--font-script);
+  font-size: 0.55em;
+  vertical-align: 0.6em;
+  transform: rotate(-12deg);
+  background: none;
+  -webkit-text-stroke: 0;
+  color: var(--pink-hot);
+  text-shadow: var(--text-outline);
+}
+
+.brand__small {
+  font-size: 0.6em;
+}
+
+/* Glitter script */
+.brand__word--glitter {
+  font-family: var(--font-script);
+  padding: 0 0.15em 0.1em;
+  background:
+    radial-gradient(circle, #fff 0 0.6px, transparent 1px) 0 0 / 5px 5px,
+    radial-gradient(circle, #fff 0 0.5px, transparent 0.9px) 2px 3px / 7px 7px,
+    linear-gradient(100deg, #ff2e93, #ff7ac8 35%, #c77dff 65%, #ff2e93);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(1.5px 1.5px 0 #fff) drop-shadow(-1.5px -1.5px 0 #fff) drop-shadow(3px 3px 0 var(--plum));
+}
+
+/* Rainbow WordArt */
+.brand__word--wordart {
+  font-family: var(--font-display);
+  background: linear-gradient(180deg, #ff5fb7 10%, #ffe066 40%, #7df0c3 62%, #7fb2ff 80%, #c58bff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--plum);
+  transform: skewX(-10deg) scaleY(1.2);
+  filter: drop-shadow(1px 1px 0 var(--plum)) drop-shadow(1px 1px 0 var(--plum)) drop-shadow(1px 1px 0 var(--plum))
+    drop-shadow(1px 1px 0 var(--plum));
+}
+
+/* Pixel prompt */
+.brand__word--pixel {
+  font-family: var(--font-pixel);
+  font-size: calc(var(--brand-size, clamp(30px, 10vw, 40px)) * 0.5);
+  padding: 0.5em 0.7em;
+  color: #ff5fb0;
+  background: linear-gradient(180deg, #2a2830 0%, var(--chrome-900) 55%, #1b1a20 100%);
+  border: 3px solid;
+  border-color: var(--chrome-200) var(--chrome-600) var(--chrome-600) var(--chrome-200);
+  box-shadow: 3px 3px 0 var(--ink);
+  text-shadow: 0 0 6px rgba(255, 46, 147, 0.7);
+}
+
+.brand__cursor {
+  display: inline-block;
+  width: 0.6em;
+  height: 1em;
+  margin-left: 0.2em;
+  vertical-align: -0.15em;
+  background: currentColor;
+}
+
+/* Cut-out letters */
+.brand__word--cutout {
+  display: flex;
+  align-items: center;
+  gap: 0.25em;
+  font-size: calc(var(--brand-size, clamp(30px, 10vw, 40px)) * 0.75);
+}
+
+.cut-word {
+  display: inline-flex;
+  gap: 1px;
+}
+
+.cut-word--small {
+  font-size: 0.65em;
+  align-self: flex-start;
+}
+
+.cut {
+  display: inline-block;
+  min-width: 0.95em;
+  padding: 0.08em 0.14em;
+  text-align: center;
+  line-height: 1.1;
+  color: var(--ink);
+  background: #fff;
+  box-shadow: 1.5px 2px 0 rgba(20, 18, 24, 0.55);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-weight: 700;
+  transform: rotate(-4deg);
+}
+
+.cut:nth-child(4n + 2) {
+  color: #fff;
+  background: var(--ink);
+  font-family: var(--font-display);
+  font-weight: 400;
+  transform: rotate(5deg) translateY(2px);
+}
+
+.cut:nth-child(4n + 3) {
+  background: var(--chrome-key);
+  font-family: 'Courier New', monospace;
+  transform: rotate(-2deg) translateY(-2px);
+}
+
+.cut:nth-child(4n + 4) {
+  color: #fff;
+  background: var(--pink-deep);
+  font-family: var(--font-script);
+  font-weight: 400;
+  transform: rotate(6deg);
+}
+
+.cut-word:nth-child(odd) .cut:nth-child(4n + 1) {
+  background: var(--chrome-300);
+  font-family: Impact, 'Arial Narrow', sans-serif;
+  font-weight: 400;
+  transform: rotate(3deg);
+}
+
+/* Appearance picker (Settings): compact preview tiles in 2-, 3- or 4-column grids */
+.pick-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.pick-group__label {
+  font-family: var(--font-pixel);
+  font-size: var(--pixel-md);
+  line-height: 1.2;
+  color: var(--ink);
+}
+
+.picks {
+  display: grid;
+  gap: 6px;
+}
+
+.picks--2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.picks--3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.picks--4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+/* An odd one out in a two-column grid takes the whole last row. */
+.picks--2 > .pick:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
+.pick {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  min-width: 0;
+  min-height: var(--tap-min);
+  padding: 6px 4px 4px;
+  overflow: hidden;
+  background: var(--chrome-key);
+  border: 2px solid var(--ink);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--bevel-btn), 2px 2px 0 var(--ink);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.pick[aria-pressed='true'] {
+  background: linear-gradient(180deg, #ff4fa6 0%, var(--pink-deep) 60%, #b80d68 100%);
+  box-shadow: var(--bevel-btn-pressed);
+  transform: translate(2px, 2px);
+}
+
+.pick[aria-pressed='true'] .pick__label {
+  color: var(--white);
+  text-shadow: 1px 1px 0 var(--ink);
+}
+
+.pick__preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+  min-height: 30px;
+}
+
+.pick--title {
+  --brand-size: 17px;
+}
+
+.pick--title .brand__word--cutout {
+  font-size: calc(var(--brand-size) * 0.58);
+}
+
+.pick__stickers .sticker + .sticker {
+  margin-left: -5px;
+}
+
+/* "No stickers": an empty dashed slot with a slash through it */
+.pick__none {
+  width: 26px;
+  height: 26px;
+  border: 2px dashed var(--ink-soft);
+  border-radius: 50%;
+  background: linear-gradient(
+    135deg,
+    transparent calc(50% - 1px),
+    var(--ink-soft) calc(50% - 1px) calc(50% + 1px),
+    transparent calc(50% + 1px)
+  );
+}
+
+.pick[aria-pressed='true'] .pick__none {
+  border-color: var(--white);
+  background: linear-gradient(
+    135deg,
+    transparent calc(50% - 1px),
+    var(--white) calc(50% - 1px) calc(50% + 1px),
+    transparent calc(50% + 1px)
+  );
+}
+
+.pick__label {
+  font-family: var(--font-pixel);
+  font-size: var(--pixel-sm);
+  line-height: 1.15;
+  text-align: center;
+  color: var(--ink);
+  overflow-wrap: break-word;
+}
+
+/* Theme (skin) choice: name plus a one-line description instead of a preview. */
+.pick--skin {
+  justify-content: center;
+  padding: 6px 8px;
+}
+
+.pick__desc {
+  font-size: var(--font-size-xs);
+  line-height: 1.05;
+  text-align: center;
+  color: var(--color-text-muted);
+}
+
+.pick[aria-pressed='true'] .pick__desc {
+  color: var(--white);
+}
+
+/* A shrunken view of a desktop background (drawn at 2x and scaled down so the tiles read). */
+.bg-swatch {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 36px;
+  overflow: hidden;
+  border: 2px solid var(--ink);
+}
+
+.bg-swatch::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 200%;
+  height: 200%;
+  transform: scale(0.5);
+  transform-origin: 0 0;
+  background-color: var(--desktop-bg-color);
+  background-image: var(--desktop-bg-image);
+  background-size: var(--desktop-bg-size);
+  background-position: var(--desktop-bg-position);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .brand__cursor {
+    animation: brand-blink 1s steps(1) infinite;
+  }
+}
+
+@keyframes brand-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* The banner: a glossy black ticker with a hot-pink edge. Home only (see "Compact header"). */
+.marquee {
+  margin-top: var(--space-2);
+  overflow: hidden;
+  border: 2px solid var(--ink);
+  background: linear-gradient(180deg, #3a3842 0%, #141218 50%, #0b0a0e 51%, #24222a 100%);
+  box-shadow:
+    inset 0 2px 0 var(--pink-hot),
+    inset 0 -2px 0 var(--pink-hot),
+    var(--drop-hard);
+  transform: rotate(-1deg);
+}
+
+.marquee__track {
+  display: flex;
+  width: max-content;
+}
+
+.marquee__text {
+  flex-shrink: 0;
+  padding: 6px 0 5px;
+  font-family: var(--font-pixel);
+  font-size: var(--pixel-sm);
+  line-height: 1;
+  color: var(--white);
+  white-space: nowrap;
+  text-shadow: 1px 1px 0 #000;
+}
+
+/* ---------- Compact header ----------
+   Off Home the header is a slim chrome strip (≈ 40px): smaller wordmark, no side stickers,
+   no marquee. The app root carries the tab as .app--<tab>. */
+.app:not(.app--home) .brand {
+  --brand-size: 24px;
+  padding-top: calc(5px + var(--safe-top));
+  padding-bottom: 5px;
+  background: var(--titlebar-chrome);
+  border-bottom: 2px solid var(--ink);
+  box-shadow: inset 0 -2px 0 var(--chrome-400), 0 2px 0 rgba(20, 18, 24, 0.12);
+}
+
+.app:not(.app--home) .brand__row {
+  min-height: 28px;
+}
+
+.app:not(.app--home) :is(.brand__sticker, .marquee) {
+  display: none;
+}
+
+.app:not(.app--home) .brand__word--cutout {
+  font-size: calc(var(--brand-size) * 0.7);
+}
+
+.app:not(.app--home) .cut-word--small {
+  font-size: 12px;
+}
+
+.app:not(.app--home) .brand__word--pixel {
+  padding: 0.3em 0.6em;
+  border-width: 2px;
+  box-shadow: none;
+}
+
+.app:not(.app--home) .brand__word--chrome {
+  filter: drop-shadow(1.5px 1.5px 0 var(--pink-hot)) drop-shadow(1px 1px 0 var(--ink));
+}
+
+/* the strip is always light, so the night-sky overrides don't apply to it */
+:root[data-bg='midnight'] .app:not(.app--home) .brand .brand__word--pixel {
+  box-shadow: none;
+}
+
+/* clear room below the strip for a first window's corner sticker */
+.app:not(.app--home) .app__main {
+  padding-top: var(--space-5);
+}
+
+/* Loading */
+.app--loading,
+.app--error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: calc(var(--space-4) + var(--safe-top)) calc(var(--space-4) + var(--safe-right)) var(--space-4)
+    calc(var(--space-4) + var(--safe-left));
+}
+
+.app--error > .error-state {
+  width: 100%;
+  max-width: 360px;
+}
+
+.loading-dialog {
+  width: 100%;
+  max-width: 300px;
+}
+
+.loading {
+  color: var(--plum-soft);
+  text-align: center;
+  padding: var(--space-3);
+  font-size: var(--font-size-md);
+}
+
+.progress {
+  height: 24px;
+  padding: 4px;
+  background: var(--white);
+  box-shadow: var(--bevel-in);
+  border: 2px solid var(--plum);
+}
+
+.progress__fill {
+  display: block;
+  height: 100%;
+  width: 100%;
+  background: repeating-linear-gradient(90deg, var(--pink-deep) 0 10px, transparent 10px 13px);
+  transform-origin: left center;
+  transform: scaleX(0.7);
+}
+
+.screen {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+/* Plain bevelled panel (generic) */
+.card {
+  background: var(--win-surface);
+  border: 2px solid var(--win-outline);
+  box-shadow: var(--bevel-out), var(--drop-window);
+  padding: var(--space-4);
+}
+
+.hint {
+  font-size: var(--font-size-sm);
+  color: var(--plum-soft);
+}
+
+/* Hints that would otherwise sit on the glitter get their own little label */
+.hint--desktop {
+  align-self: center;
+  padding: var(--space-2) var(--space-3);
+  background: var(--win-surface);
+  border: 2px solid var(--plum);
+  box-shadow: var(--drop-hard);
+  transform: rotate(-1deg);
+}
+
+.tag {
+  display: inline-block;
+  padding: 4px 9px;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-pixel);
+  font-size: var(--pixel-xs);
+  line-height: 1.2;
+  border: 2px dashed var(--ink);
+  background: var(--holo);
+  color: var(--ink);
+  transform: rotate(-5deg);
+}
+
+/* ---------- Window ---------- */
+
+/* Silver frame with crisp light/dark bevels; the tone only changes the title bar. */
+.win,
+.win--black,
+.win--pink {
+  --titlebar-bg: var(--titlebar-black);
+  --titlebar-text: var(--white);
+  --titlebar-shadow: 1px 1px 0 #000;
+  --titlebar-edge: inset 0 -2px 0 var(--pink-hot);
+  --titlebar-gloss: linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.04) 48%, transparent 52%);
+}
+
+.win {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 5px;
+  background: var(--win-face);
+  border: 2px solid var(--win-outline);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--bevel-out), var(--drop-window);
+  color: var(--ink);
+}
+
+.win--tilted {
+  transform: rotate(var(--tilt, 0deg));
+}
+
+.win--chrome,
+.win--blue,
+.win--pastel {
+  --titlebar-bg: var(--titlebar-chrome);
+  --titlebar-text: var(--ink);
+  --titlebar-shadow: 1px 1px 0 var(--white);
+  --titlebar-edge: inset 0 -1px 0 var(--chrome-500), inset 0 1px 0 var(--white);
+  --titlebar-gloss: none;
+}
+
+.win--hot {
+  --titlebar-bg: var(--titlebar-hot);
+  --titlebar-text: var(--white);
+  --titlebar-shadow: var(--text-outline);
+  --titlebar-edge: inset 0 -2px 0 rgba(20, 18, 24, 0.35);
+}
+
+.win--holo,
+.win--lilac {
+  --titlebar-bg: var(--titlebar-holo);
+  --titlebar-text: var(--ink);
+  --titlebar-shadow: 1px 1px 0 rgba(255, 255, 255, 0.9);
+  --titlebar-edge: inset 0 -1px 0 rgba(20, 18, 24, 0.25);
+  /* a diagonal foil sheen instead of the top gloss */
+  --titlebar-gloss: linear-gradient(
+    115deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.75) 32%,
+    transparent 44%,
+    transparent 62%,
+    rgba(255, 255, 255, 0.55) 72%,
+    transparent 82%
+  );
+}
+
+.win--error {
+  --titlebar-bg: var(--titlebar-error);
+  --titlebar-text: var(--white);
+  --titlebar-shadow: var(--text-outline);
+  --titlebar-edge: inset 0 -2px 0 rgba(20, 18, 24, 0.35);
+}
+
+.win__titlebar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 30px;
+  padding: 3px 3px 3px 6px;
+  background: var(--titlebar-bg);
+  box-shadow: var(--titlebar-edge);
+  color: var(--titlebar-text);
+  overflow: hidden;
+}
+
+/* Gloss (or foil sheen) over the title bar */
+.win__titlebar::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: var(--titlebar-gloss);
+}
+
+.win:has(> .win__stickers .win__sticker--tl) > .win__titlebar {
+  padding-left: 38px;
+}
+
+.win__icon {
+  position: relative;
+  z-index: 1;
+}
+
+.win__title {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-pixel);
+  font-size: var(--pixel-lg);
+  font-weight: var(--font-weight-normal);
+  line-height: 1.15;
+  color: var(--titlebar-text);
+  text-shadow: var(--titlebar-shadow);
+  overflow-wrap: anywhere;
+}
+
+.win__controls {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+/* Little chrome keys */
+.win__ctl {
+  position: relative;
+  width: 20px;
+  height: 18px;
+  flex-shrink: 0;
+  background: var(--chrome-key);
+  border: 1px solid var(--ink);
+  box-shadow: inset -2px -2px 0 rgba(90, 94, 104, 0.6), inset 2px 2px 0 var(--white);
+}
+
+.win__ctl--min::before {
+  content: '';
+  position: absolute;
+  left: 5px;
+  bottom: 4px;
+  width: 7px;
+  height: 2px;
+  background: var(--ink);
+}
+
+.win__ctl--max::before {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 3px;
+  width: 10px;
+  height: 8px;
+  border: 1px solid var(--ink);
+  border-top-width: 2px;
+}
+
+.win__ctl--close::before,
+.win__ctl--close::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 7px;
+  width: 10px;
+  height: 2px;
+  background: var(--ink);
+  transform: rotate(45deg);
+}
+
+.win__ctl--close::after {
+  transform: rotate(-45deg);
+}
+
+/* ---- Collapsible windows (Settings): the whole title bar is a disclosure button ---- */
+
+.win__titlebar--toggle {
+  padding: 0;
+}
+
+.win__titlebar--toggle > .win__title {
+  display: flex;
+  align-self: stretch;
+}
+
+.win__toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  min-height: var(--tap-min);
+  margin: 0;
+  padding: 4px 6px 4px 8px;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  line-height: inherit;
+  text-align: left;
+  text-shadow: inherit;
+}
+
+.win__toggle:focus-visible {
+  outline: none;
+  box-shadow:
+    inset 0 0 0 2px var(--white),
+    inset 0 0 0 5px var(--color-focus);
+}
+
+.win__toggle-text {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.win__summary {
+  font-size: var(--pixel-sm);
+  opacity: 0.9;
+}
+
+/* A chrome arrow key: points down when collapsed, up when open */
+.win__ctl--toggle {
+  width: 26px;
+  height: 22px;
+}
+
+.win__ctl--toggle::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin: -3px 0 0 -6px;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 7px solid var(--ink);
+}
+
+.win__toggle[aria-expanded='true'] .win__ctl--toggle::before {
+  border-top: 0;
+  border-bottom: 7px solid var(--ink);
+  margin-top: -4px;
+}
+
+.win__toggle:active .win__ctl--toggle {
+  box-shadow: inset 2px 2px 0 rgba(20, 18, 24, 0.4);
+}
+
+/* Collapsed: just the title bar in its frame */
+.win--collapsed {
+  padding-bottom: 5px;
+}
+
+.win [hidden] {
+  display: none !important;
+}
+
+.win__menu {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 14px;
+  padding: 5px 6px 3px;
+  font-family: var(--font-pixel);
+  font-size: var(--pixel-sm);
+  line-height: 1.2;
+  color: var(--ink);
+  border-bottom: 1px solid var(--bevel-lo);
+  box-shadow: 0 1px 0 var(--bevel-hi);
+}
+
+.win__menu u {
+  text-decoration-thickness: 2px;
+  text-underline-offset: 2px;
+  text-decoration-color: var(--pink-deep);
+}
+
+.win__body {
+  margin-top: 5px;
+  padding: var(--space-4);
+  background: var(--win-surface);
+  box-shadow: var(--bevel-in);
+  color: var(--ink);
+  min-width: 0;
+}
+
+.win__status {
+  display: flex;
+  gap: 3px;
+  margin-top: 5px;
+  min-height: 24px;
+}
+
+.win__status-cell {
+  flex: 1;
+  min-width: 0;
+  padding: 2px 8px;
+  font-family: var(--font-body);
+  font-size: 18px;
+  line-height: 1.1;
+  color: var(--ink-soft);
+  box-shadow: var(--bevel-in);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.win:has(> .win__stickers .win__sticker--bl) > .win__status .win__status-cell {
+  padding-left: 34px;
+}
+
+.win__status-grip {
+  width: 24px;
+  flex-shrink: 0;
+  background: repeating-linear-gradient(
+    135deg,
+    transparent 0 4px,
+    var(--bevel-lo) 4px 6px,
+    var(--bevel-hi) 6px 8px
+  );
+}
+
+/* Stickers slapped on window corners */
+.win__stickers {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.win__sticker {
+  position: absolute;
+  line-height: 0;
+}
+
+.win__sticker--tl {
+  top: -20px;
+  left: -14px;
+}
+.win__sticker--tr {
+  top: -20px;
+  right: -12px;
+}
+.win__sticker--bl {
+  bottom: -18px;
+  left: -12px;
+}
+.win__sticker--br {
+  bottom: -18px;
+  right: -12px;
+}
+
+/* Non-interactive "button" used in decorative dialogs */
+.fake-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 84px;
+  min-height: 34px;
+  padding: 4px 14px;
+  font-family: var(--font-pixel);
+  font-size: var(--pixel-md);
+  color: var(--ink);
+  background: var(--chrome-key);
+  border: 2px solid var(--ink);
+  box-shadow: var(--bevel-btn);
+  outline: 1px dotted var(--ink);
+  outline-offset: -7px;
+}
+
+/* ---------- Tab bar (taskbar) ----------
+   A liquid-chrome taskbar of equal chrome keys (pixel icon over a 12px label); the current
+   tab is pressed in and hot pink. Works for any number of tabs at 390px. */
+
+.tabbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  max-width: var(--app-max-width);
+  margin: 0 auto;
+  display: flex;
+  align-items: stretch;
+  gap: 5px;
+  padding: 6px calc(6px + var(--safe-right)) calc(6px + var(--safe-bottom)) calc(6px + var(--safe-left));
+  background: linear-gradient(180deg, #fbfbfc 0%, #e4e6ea 46%, #cdd0d6 54%, #dcdee3 100%);
+  border-top: 2px solid var(--ink);
+  box-shadow:
+    inset 0 2px 0 var(--white),
+    inset 0 -1px 0 var(--chrome-400),
+    0 -3px 0 rgba(20, 18, 24, 0.14);
+}
+
+.tabbar__tab {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 52px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 4px 2px;
+  background: var(--chrome-key);
+  border: 2px solid var(--ink);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--bevel-btn);
+  color: var(--ink);
+  font-family: var(--font-pixel);
+  font-size: var(--pixel-sm);
+  line-height: 1;
+}
+
+.tabbar__icon {
+  line-height: 0;
+}
+
+.tabbar__label {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tabbar__tab:active:not(.is-active) {
+  box-shadow: var(--bevel-btn-pressed);
+}
+
+.tabbar__tab.is-active {
+  background: linear-gradient(180deg, #b80d68 0%, var(--pink-deep) 35%, #e0208a 100%);
+  color: var(--white);
+  box-shadow:
+    var(--bevel-btn-pressed),
+    inset 0 -2px 0 rgba(255, 255, 255, 0.25);
+  text-shadow: 1px 1px 0 var(--ink);
+}
+
+/* the icon sits on a small white chip so its pink pixels still show on the pink key */
+.tabbar__tab.is-active .tabbar__icon {
+  padding: 1px;
+  background: var(--white);
+  box-shadow: 0 0 0 1px var(--ink);
+  transform: translate(1px, 1px);
+}
+
+/* The old "XOXO" tray is gone from the taskbar. */
+.tabbar__tray {
+  display: none;
+}
+
+/* ---------- Buttons ---------- */
+
+.btn {
+  position: relative;
+  min-height: var(--tap-min);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--ink);
+  background: var(--chrome-key);
+  color: var(--ink);
+  box-shadow: var(--bevel-btn), var(--drop-hard);
+  font-family: var(--font-pixel);
+  font-size: var(--pixel-md);
+  font-weight: var(--font-weight-normal);
+  line-height: 1.15;
+}
+
+.btn:active:not(:disabled) {
+  transform: translate(3px, 3px);
+  box-shadow: var(--bevel-btn-pressed);
+}
+
+.btn:disabled {
+  opacity: 0.55;
+}
+
+.btn--primary {
+  background: linear-gradient(180deg, #ff6db8 0%, var(--pink-deep) 55%, #b80d68 100%);
+  color: var(--white);
+  text-shadow: 1px 1px 0 var(--plum);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.6),
+    inset 0 -3px 0 rgba(20, 18, 24, 0.35),
+    var(--drop-hard);
+}
+
+/* Secondary: a bevelled liquid-chrome key */
+.btn--secondary {
+  background: var(--chrome-key);
+  color: var(--ink);
+}
+
+.btn--link {
+  min-height: var(--tap-min);
+  background: none;
+  border: 0;
+  box-shadow: none;
+  color: var(--pink-deep);
+  font-family: var(--font-body);
+  font-size: var(--font-size-md);
+  text-decoration: underline;
+  text-decoration-style: wavy;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+
+.btn--link:active:not(:disabled) {
+  transform: none;
+  box-shadow: none;
+  color: var(--plum);
+}
+
+.btn--inline {
+  min-height: 0;
+  padding: 0;
+  font-size: inherit;
+}
+
+.btn--block {
+  display: block;
+  width: 100%;
+}
+
+.btn--big {
+  min-height: 64px;
+  font-size: var(--font-size-lg);
+  border-radius: var(--radius-lg);
+}
+
+.btn--icon {
+  min-width: var(--tap-min);
+  padding: 0;
+  line-height: 1;
+}
+
+.btn--arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.arrow {
+  width: 0;
+  height: 0;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+}
+.arrow--left {
+  border-right: 10px solid var(--plum);
+}
+.arrow--right {
+  border-left: 10px solid var(--plum);
+}
+
+/* Glossy lip-gloss pill (Hatch, Save) */
+.btn--glossy,
+.checkin__save {
+  min-height: 56px;
+  border-width: 3px;
+  border-radius: 16px;
+  font-family: var(--font-display);
+  font-size: var(--font-size-lg);
+  letter-spacing: 0.02em;
+  text-shadow: 2px 2px 0 var(--plum), -1px -1px 0 var(--plum), 1px -1px 0 var(--plum), -1px 1px 0 var(--plum);
+}
+
+.btn--glossy.btn--primary,
+.checkin__save.btn--primary {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.12) 46%, transparent 50%),
+    linear-gradient(180deg, #ff6db8 0%, var(--pink-deep) 55%, #b80d68 100%);
+}
+
+/* The Check-in hero: "Start" button meets lip gloss */
+.btn--start {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  min-height: 84px;
+  padding: var(--space-2) var(--space-5);
+  overflow: hidden;
+  border: 3px solid var(--plum);
+  border-radius: 22px;
+  background: linear-gradient(180deg, #ff7cc0 0%, #ff3d9e 46%, #e0137f 54%, #a70a5e 100%);
+  box-shadow:
+    inset 0 -6px 0 rgba(20, 18, 24, 0.3),
+    inset 0 3px 0 rgba(255, 255, 255, 0.55),
+    6px 6px 0 var(--plum);
+  font-family: var(--font-display);
+  font-size: 34px;
+  line-height: 1;
+  color: var(--white);
+  text-shadow: 2px 2px 0 var(--plum), -1px -1px 0 var(--plum), 1px -1px 0 var(--plum), -1px 1px 0 var(--plum),
+    3px 3px 0 var(--plum);
+}
+
+.btn--start:active:not(:disabled) {
+  transform: translate(4px, 4px);
+  box-shadow:
+    inset 0 -3px 0 rgba(20, 18, 24, 0.3),
+    inset 0 3px 0 rgba(20, 18, 24, 0.3),
+    2px 2px 0 var(--plum);
+}
+
+/* gloss highlight */
+.btn--start::before {
+  content: '';
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  top: 5px;
+  height: 42%;
+  border-radius: 16px 16px 40px 40px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.08));
+  pointer-events: none;
+}
+
+/* holographic shine that sweeps across */
+.btn--start::after {
+  content: '';
+  position: absolute;
+  top: -20%;
+  bottom: -20%;
+  left: 0;
+  width: 34%;
+  background: linear-gradient(
+    100deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.55) 45%,
+    rgba(214, 240, 255, 0.5) 55%,
+    transparent 100%
+  );
+  transform: translateX(-140%) skewX(-18deg);
+  pointer-events: none;
+}
+
+.btn--start__icon {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  flex-shrink: 0;
+  background: var(--chrome-key);
+  border: 2px solid var(--ink);
+  border-radius: 10px;
+  box-shadow: inset -3px -3px 0 var(--chrome-300), inset 3px 3px 0 #fff;
+  transform: rotate(-8deg);
+}
+
+.btn--start__label {
+  position: relative;
+  z-index: 1;
+}
+
+.btn--start__sparkle {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background: #fff;
+  clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%);
+  pointer-events: none;
+}
+.btn--start__sparkle--a {
+  top: 10px;
+  right: 22px;
+}
+.btn--start__sparkle--b {
+  bottom: 12px;
+  right: 54px;
+  width: 10px;
+  height: 10px;
+}
+
+.btn--small {
+  padding: var(--space-1) var(--space-3);
+}
+
+.button-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* ---------- Form fields ---------- */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.field__label {
+  font-family: var(--font-pixel);
+  font-size: var(--pixel-md);
+  font-weight: var(--font-weight-normal);
+  line-height: 1.25;
+  color: var(--plum);
+}
+
+.field--row {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-height: var(--tap-min);
+}
+
+.input {
+  min-height: 48px;
+  padding: var(--space-1) var(--space-3);
+  border: 2px solid var(--plum);
+  border-radius: 0;
+  background: var(--white);
+  box-shadow: var(--bevel-in);
+  color: var(--plum);
+  font-family: var(--font-body);
+  /* 16px+ stops iOS zooming into the field */
+  font-size: max(16px, var(--font-size-lg));
+  line-height: 1.1;
+}
+
+.input::placeholder {
+  color: var(--plum-soft);
+  opacity: 0.75;
+}
+
+.input:focus {
+  background: var(--pink-milk);
+}
+
+.input--number {
+  width: 5em;
+  text-align: center;
+}
+
+.input--time {
+  min-width: 128px;
+}
+
+.form-error,
+.status--error {
+  color: var(--cherry);
+  font-size: var(--font-size-sm);
+}
+
+.status--ok {
+  color: var(--color-success);
+  font-size: var(--font-size-sm);
+}
+
+.status {
+  align-self: flex-start;
+  padding: 2px 10px;
+  border: 2px solid currentColor;
+  background: var(--white);
+}
+
+.status--ok {
+  background: var(--mint-soft);
+}
+
+
+/* Chips (single or multi select) */
+
+.chips {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.chips--wrap,
+.field--chips .chips {
+  flex-wrap: wrap;
+}
+
+.chip {
+  min-height: var(--tap-min);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--ink);
+  background: var(--chrome-key);
+  color: var(--ink);
+  box-shadow: var(--bevel-btn), var(--drop-hard);
+  font-family: var(--font-pixel);
+  font-size: var(--pixel-md);
+  line-height: 1.15;
+}
+
+.chip.is-selected {
+  background: var(--pink-deep);
+  color: var(--white);
+  text-shadow: 1px 1px 0 var(--plum);
+  box-shadow: var(--bevel-btn-pressed);
+  transform: translate(3px, 3px);
+}
+
+
+/* Segmented control */
+
+.segmented {
+  display: flex;
+  border: 2px solid var(--plum);
+  border-radius: var(--radius-sm);
+  background: var(--plum);
+  gap: 2px;
+  box-shadow: var(--drop-hard);
+}
+
+.segment {
+  flex: 1;
+  min-height: var(--tap-min);
+  border: 0;
+  background: var(--chrome-key);
+  color: var(--ink);
+  box-shadow: var(--bevel-btn);
+  font-family: var(--font-pixel);
+  font-size: var(--pixel-md);
+}
+
+/* segments select in glossy black; chips and ratings in hot pink */
+.segment.is-selected {
+  background: linear-gradient(180deg, #3a3842 0%, var(--ink) 55%, #000 100%);
+  color: var(--white);
+  text-shadow: 1px 1px 0 var(--plum);
+  box-shadow: var(--bevel-btn-pressed);
+}
+
+/* Rating row (1-6) */
+
+.rating {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3) 0;
+  border-bottom: 2px dotted var(--chrome-300);
+}
+
+.rating:last-child {
+  border-bottom: 0;
+}
+
+.rating__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.rating__label {
+  font-family: var(--font-body);
+  font-size: var(--font-size-md);
+  line-height: 1.05;
+  color: var(--plum);
+}
+
+.rating__value {
+  flex-shrink: 0;
+  padding: 3px 7px;
+  font-family: var(--font-pixel);
+  font-size: var(--pixel-xs);
+  line-height: 1.2;
+  white-space: nowrap;
+  color: var(--ink-soft);
+  background: var(--chrome-100);
+  border: 1px solid var(--ink-soft);
+}
+
+.rating:not(.rating--1) .rating__value {
+  color: var(--white);
+  background: var(--pink-deep);
+  border-color: var(--plum);
+}
+
+.rating__scale {
+  display: flex;
+  gap: 5px;
+}
+
+.rating__dot {
+  flex: 1;
+  min-width: var(--tap-min);
+  min-height: var(--tap-min);
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--plum);
+  background: var(--white);
+  color: var(--plum-soft);
+  box-shadow: var(--bevel-btn);
+  font-family: var(--font-pixel);
+  font-size: var(--pixel-lg);
+}
+
+/* Filled dots build up like a heat meter, chrome to hot pink */
+.rating__dot.is-filled {
+  color: var(--ink);
+  background: var(--chrome-200);
+}
+.rating__dot.is-filled:nth-child(2) {
+  background: #f7d6e8;
+}
+.rating__dot.is-filled:nth-child(3) {
+  background: #f8b5d6;
+}
+.rating__dot.is-filled:nth-child(4) {
+  background: #f68fc2;
+}
+.rating__dot.is-filled:nth-child(5) {
+  background: #f26aae;
+}
+
+.rating__dot.is-selected,
+.rating__dot.is-filled.is-selected {
+  background: var(--pink-deep);
+  color: var(--white);
+  text-shadow: 1px 1px 0 var(--plum);
+  box-shadow: var(--bevel-btn-pressed);
+}
+
+/* ---------- Modal / sheet (check-in window) ---------- */
+
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  background: var(--color-backdrop);
+}
+
+.modal--full {
+  align-items: stretch;
+}
+
+.modal--sheet {
+  align-items: flex-end;
+}
+
+.modal__panel {
+  width: 100%;
+  max-width: var(--app-max-width);
+  display: flex;
+  flex-direction: column;
+  background: var(--win-face);
+  border-left: 2px solid var(--plum);
+  border-right: 2px solid var(--plum);
+  box-shadow: var(--bevel-out);
+  outline: none;
+}
+
+.modal--full .modal__panel {
+  height: 100dvh;
+}
+
+.modal--sheet .modal__panel {
+  max-height: 85dvh;
+  border: 2px solid var(--plum);
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  box-shadow: var(--bevel-out), var(--shadow-sheet);
+}
+
+.modal__header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) calc(var(--space-2) + var(--safe-right)) var(--space-2)
+    calc(var(--space-3) + var(--safe-left));
+  min-height: calc(var(--tap-min) + var(--space-2) * 2);
+  background: var(--titlebar-black);
+  box-shadow: inset 0 -3px 0 var(--pink-hot);
+  color: var(--white);
+  overflow: hidden;
+}
+
+.modal__header::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.04) 48%, transparent 52%);
+}
+
+.modal--full .modal__header {
+  padding-top: calc(var(--space-2) + var(--safe-top));
+}
+
+.modal__icon,
+.modal__title,
+.modal__fake-controls,
+.modal__close {
+  position: relative;
+  z-index: 1;
+}
+
+.modal__title {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-pixel);
+  font-size: var(--pixel-lg);
+  line-height: 1.2;
+  color: var(--white);
+  text-shadow: var(--text-outline);
+  overflow-wrap: anywhere;
+}
+
+.modal__fake-controls {
+  display: flex;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.modal__close {
+  width: var(--tap-min);
+  height: var(--tap-min);
+  flex-shrink: 0;
+  padding: 0;
+  border: 2px solid var(--ink);
+  border-radius: var(--radius-sm);
+  background: var(--chrome-key);
+  box-shadow: var(--bevel-btn);
+}
+
+.modal__close:active {
+  box-shadow: var(--bevel-btn-pressed);
+}
+
+.modal__close-x {
+  position: absolute;
+  inset: 0;
+}
+
+.modal__close-x::before,
+.modal__close-x::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 20px;
+  height: 4px;
+  margin: -2px 0 0 -10px;
+  background: var(--plum);
+  transform: rotate(45deg);
+}
+
+.modal__close-x::after {
+  transform: rotate(-45deg);
+}
+
+.modal__panel > .win__menu {
+  padding-left: calc(var(--space-3) + var(--safe-left));
+  padding-right: calc(var(--space-3) + var(--safe-right));
+}
+
+.modal__body {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  margin: 4px calc(4px + var(--safe-right)) 0 calc(4px + var(--safe-left));
+  padding: var(--space-4) var(--space-3);
+  background: var(--win-surface);
+  box-shadow: var(--bevel-in);
+  scrollbar-color: var(--chrome-500) var(--chrome-100);
+}
+
+.modal__body::-webkit-scrollbar {
+  width: 14px;
+}
+
+.modal__body::-webkit-scrollbar-track {
+  background: repeating-conic-gradient(var(--chrome-200) 0 25%, #fff 0 50%) 0 0 / 4px 4px;
+}
+
+.modal__body::-webkit-scrollbar-thumb {
+  background: var(--chrome-key);
+  border: 2px solid var(--plum);
+  box-shadow: var(--bevel-btn);
+}
+
+.modal__footer {
+  position: relative;
+  padding: var(--space-4) calc(var(--space-4) + var(--safe-right)) calc(var(--space-3) + var(--safe-bottom))
+    calc(var(--space-4) + var(--safe-left));
+  background: var(--win-face);
+  border-top: 2px solid var(--plum);
+  box-shadow: inset 0 2px 0 var(--bevel-hi);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.modal__gems {
+  position: absolute;
+  top: -9px;
+  left: 50%;
+  width: 72%;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+/* ---------- Check-in ---------- */
+
+.checkin__intro {
+  margin-bottom: var(--space-4);
+  padding: var(--space-2) var(--space-3);
+  border: 2px solid var(--ink);
+  background: var(--holo);
+  box-shadow: var(--drop-hard);
+  font-size: var(--font-size-md);
+}
+
+.checkin__intro::before {
+  content: '';
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-right: 6px;
+  vertical-align: -1px;
+  background: var(--pink-deep);
+  clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%);
+}
+
+.checkin__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* Each section is a classic etched "group box" */
+.checkin__section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border: 2px solid var(--bevel-lo);
+  box-shadow: inset 1px 1px 0 #fff, 1px 1px 0 #fff;
+  background: rgba(255, 255, 255, 0.65);
+}
+
+.checkin__section--moods {
+  gap: 0;
+  padding-bottom: var(--space-1);
+}
+
+.checkin__heading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-pixel);
+  font-size: var(--pixel-lg);
+  color: var(--pink-deep);
+}
+
+.checkin__section--moods .checkin__heading {
+  margin-bottom: var(--space-1);
+}
+
+.checkin__save {
+  min-height: 60px;
+}
+
+.checkin__error {
+  color: var(--cherry);
+  font-size: var(--font-size-sm);
+}
+
+/* ---------- Home ---------- */
+
+/* Cycle hero window */
+.cycle > .win__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  background:
+    radial-gradient(circle at 100% 0, rgba(255, 46, 147, 0.1), transparent 55%),
+    radial-gradient(circle at 0 100%, rgba(140, 205, 255, 0.16), transparent 50%),
+    var(--win-surface);
+}
+
+.cycle__head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
+}
+
+.cycle__day {
+  font-family: var(--font-display);
+  line-height: 0.95;
+  color: var(--pink-hot);
+  text-shadow:
+    2px 2px 0 #fff,
+    4px 4px 0 var(--plum);
+}
+
+.cycle__day-label {
+  font-size: 36px;
+}
+
+.cycle__day-num {
+  font-size: 76px;
+  color: var(--pink-deep);
+}
+
+.cycle__title {
+  font-family: var(--font-display);
+  font-size: var(--font-size-xl);
+  color: var(--pink-deep);
+  text-shadow: 2px 2px 0 var(--chrome-300);
+}
+
+.cycle__gems {
+  --rhinestone-size: 16px;
+  margin: 2px 0;
+}
+
+.hatch__gems {
+  max-width: 200px;
+}
+
+.cycle__phase {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 6px 14px 6px 8px;
+  border-radius: var(--radius-pill);
+  border: 2px solid var(--plum);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.85) 0 42%, rgba(255, 255, 255, 0) 52%),
+    var(--badge-bg, var(--pink-baby));
+  box-shadow: var(--drop-hard), inset 0 -3px 0 rgba(20, 18, 24, 0.12);
+  font-family: var(--font-pixel);
+  font-size: var(--pixel-lg);
+  line-height: 1.2;
+  color: var(--plum);
+}
+
+.cycle__phase--menstrual {
+  --badge-bg: var(--phase-menstrual);
+}
+.cycle__phase--follicular {
+  --badge-bg: var(--phase-follicular);
+}
+.cycle__phase--ovulation {
+  --badge-bg: var(--phase-ovulation);
+}
+.cycle__phase--luteal {
+  --badge-bg: var(--phase-luteal);
+}
+
+.cycle__next {
+  font-size: var(--font-size-lg);
+  color: var(--plum);
+}
+
+.cycle__next {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* pixel bullet */
+.cycle__next::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  background: var(--pink-deep);
+  box-shadow: 2px 2px 0 var(--plum);
+}
+
+.cycle__next.is-late::before {
+  background: var(--cherry);
+}
+
+.cycle__next.is-late {
+  color: var(--cherry);
+}
+
+.cycle__empty {
+  color: var(--plum-soft);
+  font-size: var(--font-size-md);
+}
+
+.cycle--empty > .win__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.phase-swatch {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  border-radius: 0;
+  border: 2px solid var(--plum);
+  box-shadow: inset 2px 2px 0 rgba(255, 255, 255, 0.7);
+}
+
+.phase-swatch--menstrual {
+  background: var(--phase-menstrual);
+}
+.phase-swatch--follicular {
+  background: var(--phase-follicular);
+}
+.phase-swatch--ovulation {
+  background: var(--phase-ovulation);
+}
+.phase-swatch--luteal {
+  background: var(--phase-luteal);
+}
+.phase-swatch--predicted {
+  background: var(--phase-predicted-hatch), var(--chrome-200);
+  border-style: dashed;
+  border-color: var(--phase-predicted-border);
+}
+
+/* Check-in card */
+.checkin-card {
+  position: relative;
+}
+
+.checkin-card__panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
+  padding: var(--space-3);
+  background: linear-gradient(180deg, var(--white), var(--chrome-100));
+  border: 2px solid var(--ink);
+  border-radius: var(--radius-md);
+  box-shadow: inset 4px 0 0 var(--pink-hot), var(--bevel-btn), var(--drop-window);
+}
+
+.checkin-card__done {
+  font-family: var(--font-pixel);
+  font-size: var(--pixel-md);
+  line-height: 1.3;
+  color: var(--color-success);
+}
+
+/* Quote: a taped, ruled paper scrap */
+.note {
+  position: relative;
+  margin: var(--space-2) var(--space-2) var(--space-1);
+  padding: 30px 18px 22px 40px;
+  background-color: #fffdfd;
+  background-image:
+    linear-gradient(90deg, transparent 26px, rgba(255, 46, 147, 0.55) 26px 28px, transparent 28px),
+    repeating-linear-gradient(180deg, transparent 0 31px, #c3cfff 31px 32px);
+  background-position: 0 0, 0 22px;
+  box-shadow: 5px 6px 0 rgba(20, 18, 24, 0.28);
+  transform: rotate(-2deg);
+}
+
+/* pinked bottom edge */
+.note::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -8px;
+  height: 8px;
+  background:
+    linear-gradient(135deg, #fffdfd 50%, transparent 50%) 0 0 / 12px 8px repeat-x,
+    linear-gradient(225deg, #fffdfd 50%, transparent 50%) 0 0 / 12px 8px repeat-x;
+}
+
+.note__tape {
+  position: absolute;
+  top: -13px;
+  left: 50%;
+  width: 116px;
+  height: 28px;
+  margin-left: -58px;
+  /* holographic tape */
+  background:
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.5) 0 6px, transparent 6px 12px),
+    linear-gradient(100deg, rgba(255, 190, 228, 0.8), rgba(205, 215, 255, 0.8) 45%, rgba(205, 250, 235, 0.8) 75%, rgba(225, 228, 236, 0.85));
+  border-left: 2px dotted rgba(255, 255, 255, 0.9);
+  border-right: 2px dotted rgba(255, 255, 255, 0.9);
+  transform: rotate(4deg);
+}
+
+.quote {
+  font-family: var(--font-script);
+  font-size: 20px;
+  line-height: 32px;
+  color: var(--plum);
+}
+
+.note__sticker {
+  position: absolute;
+  right: -8px;
+  bottom: -18px;
+  line-height: 0;
+  pointer-events: none;
+}
+
+/* Pet slot: the Tamagotchi brings its own chrome */
+.home__pet {
+  position: relative;
+}
+
+/* Fun fact: a little pop-up dialog */
+.fact-dialog {
+  width: 94%;
+  margin-left: auto;
+}
+
+.fact-dialog > .win__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.fact-dialog__row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.fact-dialog__icon {
+  margin-top: 2px;
+}
+
+.fact {
+  font-size: var(--font-size-md);
+  color: var(--plum);
+}
+
+.fact__label {
+  display: block;
+  margin-bottom: var(--space-1);
+  font-family: var(--font-pixel);
+  font-size: var(--pixel-sm);
+  color: var(--pink-deep);
+}
+
+.fact-dialog__actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* ---------- Hatch & memorial ---------- */
+
+.hatch-window {
+  margin-top: var(--space-3);
+}
+
+.hatch,
+.memorial > .win__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  text-align: center;
+}
+
+.hatch .field {
+  text-align: left;
+}
+
+.hatch__art,
+.memorial__art {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  line-height: 0;
+}
+
+/* Sunburst nest behind the egg */
+.hatch__nest {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 168px;
+  height: 168px;
+  border-radius: 50%;
+  border: 3px solid var(--plum);
+  overflow: hidden;
+  background: radial-gradient(circle, #fff 0 30%, var(--chrome-200) 64%, var(--chrome-400) 100%);
+  box-shadow: var(--drop-hard);
+}
+
+.hatch__nest::before {
+  content: '';
+  position: absolute;
+  inset: -20%;
+  background: repeating-conic-gradient(rgba(255, 46, 147, 0.22) 0 10deg, transparent 10deg 20deg);
+}
+
+.hatch__nest > * {
+  position: relative;
+}
+
+.hatch__title,
+.memorial__name {
+  font-family: var(--font-display);
+  font-size: var(--font-size-xl);
+  line-height: 1.05;
+  color: var(--pink-deep);
+  text-shadow:
+    2px 2px 0 #fff,
+    3px 3px 0 var(--plum);
+}
+
+.hatch__intro,
+.memorial__dates,
+.memorial__note {
+  color: var(--plum-soft);
+  font-size: var(--font-size-md);
+}
+
+/* The ghost sits on a little LCD screen */
+.memorial__art {
+  padding: var(--space-3) var(--space-5);
+  color: var(--plum);
+  background:
+    repeating-linear-gradient(180deg, rgba(20, 18, 24, 0.05) 0 1px, transparent 1px 3px),
+    var(--mint-soft);
+  border: 2px solid var(--plum);
+  border-radius: var(--radius-md);
+  box-shadow: var(--bevel-in);
+}
+
+.hatch__nest {
+  color: var(--plum);
+}
+
+.screen--first-run .hint {
+  text-align: center;
+}
+
+/* ---------- Calendar ---------- */
+
+.cal-window__body {
+  padding: var(--space-2);
+}
+
+.cal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.cal-header__title {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-display);
+  font-size: var(--font-size-lg);
+  line-height: 1.05;
+  text-align: center;
+  color: var(--pink-deep);
+  text-shadow:
+    2px 2px 0 #fff,
+    3px 3px 0 var(--plum);
+}
+
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 3px;
+  padding: 6px;
+  background: var(--white);
+  border: 2px solid var(--plum);
+  box-shadow: var(--bevel-in);
+}
+
+.cal-weekday {
+  text-align: center;
+  padding: 2px 0 4px;
+  font-family: var(--font-pixel);
+  font-size: var(--pixel-sm);
+  color: var(--plum-soft);
+}
+
+.cal-day {
+  --cell-bg: transparent;
+  --cell-border: transparent;
+  position: relative;
+  aspect-ratio: 1;
+  min-height: var(--tap-min);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  padding: 0;
+  border: 2px solid var(--cell-border);
+  border-radius: var(--radius-sm);
+  background-color: var(--cell-bg);
+  color: var(--plum);
+  font-family: var(--font-body);
+  font-size: var(--font-size-md);
+  line-height: 1;
+}
+
+.cal-day:disabled {
+  color: var(--plum-soft);
+  opacity: 1;
+}
+
+.cal-day--pad {
+  border: 0;
+}
+
+.cal-day--menstrual.is-actual {
+  --cell-bg: var(--phase-menstrual);
+}
+.cal-day--follicular.is-actual {
+  --cell-bg: var(--phase-follicular);
+}
+.cal-day--ovulation.is-actual {
+  --cell-bg: var(--phase-ovulation);
+}
+.cal-day--luteal.is-actual {
+  --cell-bg: var(--phase-luteal);
+}
+
+.cal-day.is-actual:not(.cal-day--no-phase) {
+  box-shadow: inset -2px -2px 0 rgba(20, 18, 24, 0.12), inset 2px 2px 0 rgba(255, 255, 255, 0.7);
+}
+
+.cal-day.is-predicted {
+  color: var(--plum-soft);
+  background-image: var(--phase-predicted-hatch);
+}
+.cal-day--no-phase.is-predicted {
+  background-image: none;
+}
+.cal-day--menstrual.is-predicted {
+  --cell-bg: var(--phase-menstrual-predicted);
+  --cell-border: var(--phase-predicted-border);
+  border-style: dashed;
+}
+.cal-day--follicular.is-predicted {
+  --cell-bg: var(--phase-follicular-predicted);
+  --cell-border: var(--phase-predicted-border);
+  border-style: dashed;
+}
+.cal-day--ovulation.is-predicted {
+  --cell-bg: var(--phase-ovulation-predicted);
+  --cell-border: var(--phase-predicted-border);
+  border-style: dashed;
+}
+.cal-day--luteal.is-predicted {
+  --cell-bg: var(--phase-luteal-predicted);
+  --cell-border: var(--phase-predicted-border);
+  border-style: dashed;
+}
+
+.cal-day.is-today {
+  --cell-border: var(--color-today-ring);
+  border-style: solid;
+  border-width: 3px;
+  box-shadow: inset 0 0 0 1px #fff, 0 0 0 1px var(--plum);
+}
+
+.cal-day.is-today .cal-day__num {
+  font-family: var(--font-pixel);
+  font-size: var(--pixel-lg);
+}
+
+.cal-day.is-selected {
+  outline: 2px dashed var(--color-selected-ring);
+  outline-offset: 1px;
+  z-index: 1;
+}
+
+.cal-day__marks {
+  display: flex;
+  gap: 3px;
+  height: 8px;
+  align-items: center;
+}
+
+.cal-day__flow {
+  width: 8px;
+  height: 8px;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  background: var(--color-flow);
+  box-shadow: 0 0 0 1px #fff;
+}
+
+.cal-day.is-spotting .cal-day__flow {
+  background: #fff;
+  border: 2px solid var(--color-flow);
+}
+
+.cal-day__dot {
+  width: 5px;
+  height: 5px;
+  background: var(--color-logged-dot);
+  box-shadow: 0 0 0 1px #fff;
+}
+
+/* Legend: a Paint-style colour palette */
+.cal-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
+  margin-top: var(--space-2);
+  padding: var(--space-2);
+  background: var(--white);
+  box-shadow: var(--bevel-in);
+  font-size: var(--font-size-sm);
+  color: var(--plum);
+}
+
+.cal-legend__item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cal-legend__flow {
+  width: 10px;
+  height: 10px;
+  margin: 0 3px;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  background: var(--color-flow);
+}
+
+.cal-legend__dot {
+  width: 6px;
+  height: 6px;
+  margin: 0 4px;
+  background: var(--color-logged-dot);
+}
+
+/* Day detail window */
+.day-detail__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-2);
+}
+
+.day-detail__title {
+  font-family: var(--font-display);
+  font-size: var(--font-size-lg);
+  line-height: 1.05;
+  color: var(--pink-deep);
+}
+
+.summary {
+  display: flex;
+  flex-direction: column;
+}
+
+.summary__row {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: 5px 0;
+  border-bottom: 2px dotted var(--chrome-300);
+  font-size: var(--font-size-sm);
+  line-height: 1.05;
+}
+
+.summary__row dt {
+  color: var(--plum-soft);
+}
+
+.summary__row dd {
+  text-align: right;
+  color: var(--pink-deep);
+}
+
+.summary__row--rating-1 dd {
+  color: var(--plum-soft);
+}
+
+.summary__meta {
+  margin-top: var(--space-3);
+  font-size: var(--font-size-xs);
+  color: var(--plum-soft);
+}
+
+/* ---------- Settings (control panel) ---------- */
+
+/* Concise: tighter windows, and each one collapses to its title bar (Window `collapsible`). */
+.screen--settings {
+  gap: var(--space-4);
+}
+
+.settings-group > .win__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+}
+
+.settings-group .button-stack {
+  gap: var(--space-2);
+}
+
+.settings-group .input {
+  min-height: var(--tap-min);
+}
+
+.settings-group .hint {
+  margin-top: -2px;
+  font-size: var(--font-size-xs);
+}
+
+/* Mood tracking: Off / Basic / Advanced, with a line about the current level. */
+.settings-group .mood-tracking {
+  margin-top: var(--space-2);
+}
+
+.appearance > .win__body {
+  gap: var(--space-3);
+}
+
+.settings-group__title {
+  font-family: var(--font-pixel);
+  font-size: var(--pixel-lg);
+}
+
+.privacy-note {
+  font-size: var(--font-size-md);
+  color: var(--plum-soft);
+}
+
+.graveyard__empty {
+  color: var(--plum-soft);
+  font-size: var(--font-size-md);
+}
+
+.graveyard__list {
+  display: flex;
+  flex-direction: column;
+  background: var(--white);
+  border: 2px solid var(--plum);
+  box-shadow: var(--bevel-in);
+}
+
+.graveyard__item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: var(--space-3);
+  align-items: center;
+  padding: var(--space-2) var(--space-3);
+}
+
+.graveyard__item:nth-child(even) {
+  background: var(--chrome-100);
+}
+
+.graveyard__item + .graveyard__item {
+  border-top: 1px dotted var(--plum-soft);
+}
+
+.graveyard__icon {
+  grid-row: span 2;
+  line-height: 0;
+  color: var(--plum-soft);
+}
+
+.graveyard__name {
+  font-family: var(--font-pixel);
+  font-size: var(--pixel-lg);
+  overflow-wrap: anywhere;
+}
+
+.graveyard__dates {
+  font-size: var(--font-size-xs);
+  color: var(--plum-soft);
+}
+
+/* ---------- Error state (classic error dialog) ---------- */
+
+.error-state {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  align-items: flex-start;
+  padding: var(--space-3);
+  border: 2px solid var(--cherry);
+  background: var(--white);
+  overflow-wrap: anywhere;
+}
+
+.error-state.win {
+  align-items: stretch;
+  gap: 0;
+  padding: 5px;
+  border-color: var(--plum);
+  background: var(--win-face);
+}
+
+.error-state__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.error-state__row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.error-state__text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.error-state__title {
+  font-family: var(--font-pixel);
+  font-size: var(--pixel-lg);
+  line-height: 1.25;
+  color: var(--cherry);
+}
+
+.error-state__message {
+  font-size: var(--font-size-sm);
+  color: var(--plum-soft);
+}
+
+.error-state__actions {
+  display: flex;
+  justify-content: center;
+}
+
+/* Safari warning banner */
+.banner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  margin: var(--space-3) calc(var(--space-4) + var(--safe-right)) 0 calc(var(--space-4) + var(--safe-left));
+  padding: var(--space-2) var(--space-3);
+  border: 2px solid var(--plum);
+  background: var(--butter);
+  box-shadow: var(--drop-hard);
+  color: var(--plum);
+  font-size: var(--font-size-sm);
+}
+
+.banner__icon {
+  margin-top: 2px;
+}
+
+/* ---------- Motion (opt-in only) ---------- */
+
+@media (prefers-reduced-motion: no-preference) {
+  .twinkle {
+    animation: twinkle 2.8s ease-in-out var(--twinkle-delay, 0s) infinite;
+  }
+
+  /* scrolls through twice, then rests on "★ TOP SECRET ★" (the track is two copies, so the
+     end and start frames look the same). Re-runs whenever Home is shown again. */
+  .marquee__track {
+    animation: marquee 16s linear 0.6s 2;
+  }
+
+  .btn--start::after {
+    animation: shine 3.6s ease-in-out 1s infinite;
+  }
+
+  .btn--start__sparkle {
+    animation: twinkle-inline 1.8s ease-in-out infinite;
+  }
+
+  .btn--start__sparkle--b {
+    animation-delay: 0.9s;
+  }
+
+  .cycle__next.is-late {
+    animation: blink 1.2s steps(2, jump-none) infinite;
+  }
+
+  .hatch__nest::before {
+    animation: spin 24s linear infinite;
+  }
+
+  .brand__sticker--l {
+    animation: wiggle 3s ease-in-out infinite;
+  }
+
+  .brand__sticker--r {
+    animation: wiggle 3s ease-in-out 1.5s infinite;
+  }
+
+  .progress__fill {
+    animation: load 1.6s steps(8, end) infinite;
+  }
+
+  .note__sticker {
+    animation: wiggle 4s ease-in-out infinite;
+  }
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.15;
+    transform: translate(-50%, -50%) scale(0.5) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1) rotate(45deg);
+  }
+}
+
+@keyframes twinkle-inline {
+  0%,
+  100% {
+    opacity: 0.2;
+    transform: scale(0.5);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes shine {
+  0% {
+    transform: translateX(-140%) skewX(-18deg);
+  }
+  45%,
+  100% {
+    transform: translateX(380%) skewX(-18deg);
+  }
+}
+
+@keyframes blink {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.35;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes wiggle {
+  0%,
+  100% {
+    transform: rotate(-6deg);
+  }
+  50% {
+    transform: rotate(6deg);
+  }
+}
+
+@keyframes load {
+  from {
+    transform: scaleX(0.05);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}

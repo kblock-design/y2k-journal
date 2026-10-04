@@ -22,8 +22,3 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-
-# The public GitHub copy and anything that must stay on this PC
-published
-private
-design-refs

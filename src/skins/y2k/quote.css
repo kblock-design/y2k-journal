@@ -1,0 +1,19 @@
+/* Bottom-left, clear of the background stickers along the right edge. */
+.note .note__sticker {
+  right: auto;
+  left: 34px;
+  bottom: -20px;
+  z-index: 2;
+}
+
+.quote__by {
+  margin-top: var(--space-2);
+  font-family: var(--font-pixel);
+  font-size: 12px;
+  text-align: right;
+  color: var(--color-text-muted);
+}
+
+.quote__by::before {
+  content: '— ';
+}

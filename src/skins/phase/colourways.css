@@ -1,0 +1,277 @@
+/*
+ * PHASE colourways. Cream (the default) lives in phase.css; each block here redefines the same
+ * tokens. They match <html data-ph-colour="…"> (the saved choice) and any element carrying the
+ * attribute (the previews in Settings), so every value is a plain colour, never var(--other).
+ * Each one is its own personality: the page colour, the cards, the pills/nav and the four phase
+ * colours all change. Only Hot pink uses pink; Cobalt, Forest and Noir have none.
+ *
+ * WCAG contrast, computed. Lowest text pair per colourway:
+ *  - Cobalt:   muted page text (#d9e2ff) on the cobalt page 5.4:1; white on the disabled pill 5.4:1.
+ *  - Hot pink: muted page text (#3b0c22) on the pink page 4.8:1; black on the page 5.5:1.
+ *  - Forest:   green ink on the fullest heat cell 4.6:1; cream on the disabled pill 4.7:1.
+ *  - Noir:     muted text on the lime tint 5.2:1.
+ * Text on each phase colour uses its own --*-on (≥ 6:1). *-deep: ≥ 4.5:1 on their own tint
+ * (predicted days' dashed edge). Nav labels ≥ 6:1 on --nav-bg. The four phase colours (and their
+ * tints) are at least as far apart (CIE ΔE) as Cream's, and the solid ones stand off the page.
+ */
+
+/* ---------- Cobalt: electric blue page, crisp white cards, acid-yellow nav ---------- */
+
+[data-ph-colour='cobalt'] {
+  --bg: #1f45e0;
+  --page-ink: #ffffff;
+  --page-ink-2: #d9e2ff;
+  --page-cream: #0b1a4d;
+  --page-ink-rgb: 255 255 255;
+  --page-line: rgba(255, 255, 255, 0.2);
+  --page-alert: #e8ff47;
+
+  --surface: #ffffff;
+  --card-muted: #eef2ff;
+  --surface-2: #e7edff;
+  --surface-3: #d2dbfa;
+  --card-ink: #0b1a4d;
+  --card-ink-2: #45517c;
+  --card-cream: #ffffff;
+  --card-ink-rgb: 11 26 77;
+  --card-line: rgba(11, 26, 77, 0.1);
+  --pill-disabled: #5d6891;
+
+  --shade-rgb: 6 17 66;
+  --glass-rgb: 255 255 255;
+  --glass-edge: rgba(255, 255, 255, 0.7);
+  --nav-bg: #e8ff47;
+  --nav-ink: #3f4a66;
+  --nav-ink-on: #0b1a4d;
+  --nav-active: #cbe400;
+  --orb-hi: #ffffff;
+  --orb-mid: 46%;
+  --orb-end: 115%;
+  --orb-opacity: 1;
+  --drop-on-tone: initial;
+
+  /* Hot coral, ice cyan, acid yellow, mint: all light enough for navy text, all pop on blue. */
+  --pink: #ff6a3d;
+  --pink-tint: #ffd8c7;
+  --pink-mid: #ff5420;
+  --pink-deep: #b83200;
+  --pink-on: #0b1a4d;
+  --blue: #94e0ff;
+  --blue-tint: #d5f3ff;
+  --blue-mid: #3fbdf0;
+  --blue-deep: #0a6c9e;
+  --blue-on: #0b1a4d;
+  --yellow: #e8ff47;
+  --yellow-tint: #f4ffbd;
+  --yellow-mid: #c6dd00;
+  --yellow-deep: #586300;
+  --yellow-on: #0b1a4d;
+  --green: #47e3a6;
+  --green-tint: #c4f6e2;
+  --green-mid: #1fc98a;
+  --green-deep: #08744d;
+  --green-on: #0b1a4d;
+
+  --heat-0: #eef2ff;
+  --heat-1: #7fd3ff;
+  --lvl-0: #d2dbfa;
+  --lvl-1: #8b98cc;
+  --lvl-2: #0b1a4d;
+}
+
+/* ---------- Hot pink: a confident pink page, white cards, black pills ---------- */
+
+[data-ph-colour='hotpink'] {
+  --bg: #ff2e8a;
+  --page-ink: #160a10;
+  --page-ink-2: #3b0c22;
+  --page-cream: #ffffff;
+  --page-ink-rgb: 22 10 16;
+  --page-line: rgba(22, 10, 16, 0.14);
+  --page-alert: #160a10;
+
+  --surface: #ffffff;
+  --card-muted: #fff0f6;
+  --surface-2: #ffe7f1;
+  --surface-3: #ffd1e4;
+  --card-ink: #160a10;
+  --card-ink-2: #5c4351;
+  --card-cream: #ffffff;
+  --card-ink-rgb: 22 10 16;
+  --card-line: rgba(22, 10, 16, 0.09);
+  --pill-disabled: #6e5865;
+
+  --shade-rgb: 110 0 50;
+  --glass-rgb: 255 255 255;
+  --glass-edge: rgba(255, 255, 255, 0.7);
+  --nav-bg: #160a10;
+  --nav-ink: #f1b8d1;
+  --nav-ink-on: #ffffff;
+  --nav-active: #3d2131;
+  --orb-hi: #ffffff;
+  --orb-mid: 46%;
+  --orb-end: 160%;
+  --orb-opacity: 1;
+  --drop-on-tone: initial;
+
+  /* Deep red (white numbers), tangerine, lemon, lilac. */
+  --pink: #c8001e;
+  --pink-tint: #ffd3d6;
+  --pink-mid: #e0001f;
+  --pink-deep: #b0000f;
+  --pink-on: #ffffff;
+  --blue: #ff9417;
+  --blue-tint: #ffe2c2;
+  --blue-mid: #ff7f00;
+  --blue-deep: #9c4600;
+  --blue-on: #160a10;
+  --yellow: #ffe83b;
+  --yellow-tint: #fff6bd;
+  --yellow-mid: #f2cc00;
+  --yellow-deep: #6b5900;
+  --yellow-on: #160a10;
+  --green: #c9a9ff;
+  --green-tint: #ece1ff;
+  --green-mid: #a47cf4;
+  --green-deep: #6a3fbf;
+  --green-on: #160a10;
+
+  --heat-0: #fff0f6;
+  --heat-1: #ff7aaa;
+  --lvl-0: #ffd1e4;
+  --lvl-1: #c78aa6;
+  --lvl-2: #160a10;
+}
+
+/* ---------- Forest: deep green page, cream cards, gold nav ---------- */
+
+[data-ph-colour='forest'] {
+  --bg: #173b2c;
+  --page-ink: #f6edd6;
+  --page-ink-2: #cfc7a8;
+  --page-cream: #173b2c;
+  --page-ink-rgb: 246 237 214;
+  --page-line: rgba(246, 237, 214, 0.16);
+  --page-alert: #f2a47f;
+
+  --surface: #f8f1df;
+  --card-muted: #f0e7d0;
+  --surface-2: #ebe1c8;
+  --surface-3: #ddd1b2;
+  --card-ink: #173b2c;
+  --card-ink-2: #4c5c4b;
+  --card-cream: #f8f1df;
+  --card-ink-rgb: 23 59 44;
+  --card-line: rgba(23, 59, 44, 0.1);
+  --pill-disabled: #5f7064;
+
+  --shade-rgb: 5 22 14;
+  --glass-rgb: 248 241 223;
+  --glass-edge: rgba(255, 255, 255, 0.5);
+  --nav-bg: #dcb75c;
+  --nav-ink: #2c3a28;
+  --nav-ink-on: #10291e;
+  --nav-active: #c49e3f;
+  --orb-hi: #fffaf0;
+  --orb-mid: 46%;
+  --orb-end: 130%;
+  --orb-opacity: 1;
+  --drop-on-tone: initial;
+
+  /* Terracotta, eucalyptus, gold, sage. */
+  --pink: #e17d57;
+  --pink-tint: #f4d6bd;
+  --pink-mid: #cf6440;
+  --pink-deep: #9a3e1c;
+  --pink-on: #10291e;
+  --blue: #93c6cc;
+  --blue-tint: #d2e7e9;
+  --blue-mid: #62a6b0;
+  --blue-deep: #2c6770;
+  --blue-on: #10291e;
+  --yellow: #e5bb4a;
+  --yellow-tint: #f1dc9f;
+  --yellow-mid: #cc9d2c;
+  --yellow-deep: #6e5208;
+  --yellow-on: #10291e;
+  --green: #a9c48b;
+  --green-tint: #d2e3bf;
+  --green-mid: #87a666;
+  --green-deep: #4a6430;
+  --green-on: #10291e;
+
+  --heat-0: #f0e7d0;
+  --heat-1: #dc8a68;
+  --lvl-0: #ddd1b2;
+  --lvl-1: #9c9a7c;
+  --lvl-2: #173b2c;
+}
+
+/* ---------- Noir: true black, charcoal cards, white nav, neon phases ---------- */
+
+[data-ph-colour='noir'] {
+  --bg: #000000;
+  --page-ink: #ffffff;
+  --page-ink-2: #b4b4ba;
+  --page-cream: #000000;
+  --page-ink-rgb: 255 255 255;
+  --page-line: rgba(255, 255, 255, 0.12);
+  --page-alert: #ff9d52;
+
+  --surface: #161618;
+  --card-muted: #1f1f22;
+  --surface-2: #242427;
+  --surface-3: #35353a;
+  --card-ink: #ffffff;
+  --card-ink-2: #b4b4ba;
+  --card-cream: #000000;
+  --card-ink-rgb: 255 255 255;
+  --card-line: rgba(255, 255, 255, 0.1);
+  --pill-disabled: #a1a1a8;
+
+  --shade-rgb: 0 0 0;
+  --glass-rgb: 22 22 24;
+  --glass-edge: rgba(255, 255, 255, 0.1);
+  --nav-bg: #ffffff;
+  --nav-ink: #4c4c55;
+  --nav-ink-on: #000000;
+  --nav-active: #e4e4ea;
+  /* Mostly the deep tint, so the white day number holds; the neon only glows at the rim. */
+  --orb-hi: #1c1c20;
+  --orb-mid: 52%;
+  --orb-end: 200%;
+  --orb-opacity: 0.95;
+  --drop-on-tone: initial;
+
+  /* Neon orange, electric blue, acid yellow, lime; tints are deep, *-deep are the bright marks. */
+  --pink: #ff7a1a;
+  --pink-tint: #4d2400;
+  --pink-mid: #ff7a1a;
+  --pink-deep: #ff9d52;
+  --pink-on: #000000;
+  --blue: #2e9bff;
+  --blue-tint: #133b63;
+  --blue-mid: #2e9bff;
+  --blue-deep: #66b8ff;
+  --blue-on: #000000;
+  --yellow: #ffe500;
+  --yellow-tint: #433c00;
+  --yellow-mid: #ffd600;
+  --yellow-deep: #fff04d;
+  --yellow-on: #000000;
+  --green: #62ff3b;
+  --green-tint: #1a4714;
+  --green-mid: #4fe82a;
+  --green-deep: #8dff6a;
+  --green-on: #000000;
+
+  --heat-0: #1f1f22;
+  --heat-1: #0058b8;
+  --lvl-0: #35353a;
+  --lvl-1: #77777f;
+  --lvl-2: #f2f2f5;
+}
+
+:root[data-ph-colour='noir'] {
+  color-scheme: dark;
+}

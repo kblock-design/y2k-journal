@@ -1,0 +1,320 @@
+/* Gloss — the check-in sheet. Dense on purpose: it's filled in every evening. */
+
+.gl-sheet-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-top: calc(env(safe-area-inset-top, 0px) + 10px);
+  background: rgba(var(--shade-rgb), 0.4);
+}
+
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .gl-sheet-layer {
+    background: rgba(var(--shade-rgb), 0.28);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+  }
+}
+
+.gl-sheet {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  background: var(--sheet-bg);
+  box-shadow:
+    inset 0 1px 0 var(--hi),
+    0 -12px 40px rgba(var(--shade-rgb), 0.2);
+  outline: none;
+}
+
+.gl-sheet__head {
+  flex: none;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 18px calc(16px + env(safe-area-inset-right, 0px)) 10px calc(20px + env(safe-area-inset-left, 0px));
+}
+
+.gl-sheet__titles {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.gl-sheet__title {
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+/* The body scrolls under the frosted Save bar. */
+.gl-sheet__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding: 4px calc(14px + env(safe-area-inset-right, 0px)) calc(130px + env(safe-area-inset-bottom, 0px))
+    calc(14px + env(safe-area-inset-left, 0px));
+}
+
+.gl-sheet__foot {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: grid;
+  gap: 8px;
+  padding: 12px calc(16px + env(safe-area-inset-right, 0px)) calc(12px + env(safe-area-inset-bottom, 0px))
+    calc(16px + env(safe-area-inset-left, 0px));
+  background: var(--sheet-foot);
+  box-shadow: 0 -1px 0 rgba(var(--edge-rgb), 0.08);
+}
+
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .gl-sheet__foot {
+    background: var(--sheet-foot-glass);
+    -webkit-backdrop-filter: blur(18px) saturate(1.4);
+    backdrop-filter: blur(18px) saturate(1.4);
+  }
+}
+
+.gl-sheet__error {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--hot-deep);
+  overflow-wrap: anywhere;
+}
+
+.gl-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  background: var(--hot-tint);
+  box-shadow: inset 0 0 0 1px rgba(var(--hot-deep-rgb), 0.14);
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.gl-note .gl-icon {
+  margin-top: 1px;
+  color: var(--hot-deep);
+}
+
+.gl-loading-line {
+  padding: 24px 6px;
+  color: var(--ink-2);
+}
+
+.gl-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.gl-formcard {
+  padding: 14px 14px 16px;
+  border-radius: 20px;
+  background: var(--surface);
+  box-shadow:
+    inset 0 0 0 1px rgba(var(--edge-rgb), 0.05),
+    0 1px 2px rgba(var(--shade-rgb), 0.05);
+}
+
+.gl-formcard__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.gl-formcard__title {
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.gl-formcard__hint {
+  font-size: 13px;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+
+/* Choice chips (flow, body) — selected = black gel. */
+
+.gl-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.gl-chip-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 15px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.15;
+  box-shadow: inset 0 0 0 1px rgba(var(--edge-rgb), 0.11);
+}
+
+.gl-chips--fill .gl-chip-btn {
+  flex: 1 1 auto;
+}
+
+.gl-chip-btn.is-on,
+.gl-seg__opt.is-on {
+  background: var(--sel);
+  color: var(--on-sel);
+  font-weight: 600;
+  box-shadow:
+    0 0 0 1px var(--sel-ring),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    0 2px 6px rgba(var(--shade-rgb), 0.18);
+}
+
+/* Mood ratings: six keys; lit pink up to the rating, the chosen one a hot-pink gel. */
+
+.gl-rates {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.gl-rate__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.gl-rate__label {
+  min-width: 0;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.gl-rate__value {
+  flex: none;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+.gl-rate__scale {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 5px;
+  margin-top: 6px;
+}
+
+.gl-rate__key {
+  min-width: 0;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 12px;
+  background: var(--surface-2);
+  color: var(--ink-2);
+  font-size: 15px;
+  font-weight: 600;
+  box-shadow: inset 0 0 0 1px rgba(var(--edge-rgb), 0.1);
+}
+
+.gl-rate__key.is-lit {
+  background: var(--hot-tint);
+  color: var(--ink);
+  box-shadow: inset 0 0 0 1px rgba(var(--hot-deep-rgb), 0.2);
+}
+
+.gl-rate__key.is-on {
+  background: radial-gradient(130% 100% at 50% 0%, var(--hot-gel-1) 0%, var(--hot-gel-2) 48%, var(--hot-gel-3) 100%);
+  color: var(--on-hot);
+  font-weight: 700;
+  box-shadow:
+    0 0 0 1px rgba(var(--hot-rim-rgb), 0.4),
+    inset 0 2px 0 rgba(255, 255, 255, 0.5),
+    0 3px 8px rgba(var(--hot-glow-rgb), 0.3);
+}
+
+/* Sleep, energy, cravings: label + recessed three-way switch. */
+
+.gl-segrows {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.gl-segrow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.gl-segrow__label {
+  flex: none;
+  width: 74px;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.gl-seg {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 3px;
+  padding: 3px;
+  border-radius: 999px;
+  background: var(--seg-track);
+  box-shadow: inset 0 1px 3px rgba(var(--shade-rgb), 0.12);
+}
+
+.gl-seg__opt {
+  min-width: 0;
+  min-height: 44px;
+  padding: 0 4px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--ink-2);
+  font-size: 15px;
+  font-weight: 500;
+}
+
+@media (max-width: 359px) {
+  .gl-segrow__label {
+    width: 64px;
+    font-size: 14px;
+  }
+  .gl-chip-btn {
+    padding: 0 12px;
+  }
+}
+
+/* Basic mood level: the label over the same recessed three-way switch. */
+.gl-rate--basic .gl-seg {
+  margin-top: 6px;
+}

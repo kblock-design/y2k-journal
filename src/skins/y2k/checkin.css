@@ -1,0 +1,65 @@
+/* Check-in density: the form is filled in every night, so it stays compact. */
+
+.checkin .checkin__form {
+  gap: var(--space-3);
+}
+
+.checkin .checkin__section {
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+}
+
+.checkin .rating {
+  gap: 4px;
+  padding: 6px 0;
+}
+
+.checkin .rating__dot {
+  min-height: var(--tap-min);
+}
+
+/* Sleep / energy / cravings: label beside its control instead of above it. */
+.checkin .field--segmented {
+  display: grid;
+  grid-template-columns: 5.5em 1fr;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.checkin__copy {
+  width: 100%;
+  min-height: var(--tap-min);
+}
+
+/* Basic mood level: the label above a three-way segmented control. */
+.checkin .rating--basic .segment {
+  padding: 2px var(--space-1);
+  line-height: 1.15;
+}
+
+/* A mood this entry didn't rate (edited after the level changed): nothing selected yet. */
+.checkin .rating.rating--none .rating__value {
+  color: var(--ink-soft);
+  background: var(--chrome-100);
+  border-color: var(--ink-soft);
+}
+
+/* Small phones: stack the label again so each segment keeps a full-size tap target. */
+@media (max-width: 359px) {
+  .checkin .field--segmented {
+    display: block;
+  }
+}
+
+/* Small phones: tighten tab labels so "Calendar" fits without an ellipsis. */
+@media (max-width: 359px) {
+  .tabbar {
+    gap: 3px;
+    padding-left: calc(3px + var(--safe-left));
+    padding-right: calc(3px + var(--safe-right));
+  }
+
+  .tabbar__label {
+    letter-spacing: -0.04em;
+  }
+}

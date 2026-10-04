@@ -29,6 +29,7 @@ const SETTINGS: Settings = {
   defaultCycleLength: 28,
   defaultPeriodLength: 5,
   startedOn: '2025-01-01',
+  moodTracking: 'advanced',
 }
 
 const MOODS = Object.fromEntries(MOOD_ITEMS.map((m) => [m.key, 1 as Rating])) as Record<MoodKey, Rating>

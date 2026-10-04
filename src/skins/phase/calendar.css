@@ -1,0 +1,404 @@
+/* Phase — calendar grid and the pinned day bar. */
+
+/* Room for the pinned day bar on top of the nav's own clearance, so it never hides the last row. */
+.ph-cal {
+  padding-bottom: 92px;
+}
+
+.ph-keybtn {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 16px 0 12px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--surface-2);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.ph-keybtn.is-on {
+  background: var(--ink);
+  color: var(--cream);
+}
+
+.ph-cal__card {
+  padding: 12px 6px 10px;
+}
+
+.ph-cal__nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 6px 10px;
+}
+
+.ph-cal__month {
+  flex: 1;
+  min-width: 0;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-align: center;
+}
+
+.ph-cal__grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.ph-cal__wd {
+  padding: 2px 0 4px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+.ph-day {
+  position: relative;
+  min-width: 0;
+  min-height: 44px;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  padding: 0 0 6px;
+  border: 1.5px solid transparent;
+  border-radius: var(--radius-sm);
+  background: var(--tone, transparent);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.ph-day--none,
+.ph-day--pad {
+  background: transparent;
+}
+
+/* A solid (logged-phase) day: text and marks read against the pastel itself. */
+.ph-day:not(.ph-day--none):not(.ph-day--pad):not(.is-predicted) {
+  color: var(--tone-on);
+  --drop: var(--drop-on-tone, var(--tone-on));
+}
+
+.ph-day:not(.ph-day--none):not(.ph-day--pad):not(.is-predicted) .ph-logdot {
+  background: var(--tone-on);
+}
+
+.ph-day.is-predicted {
+  background: var(--tone-tint);
+  border: 1.5px dashed var(--tone-deep);
+}
+
+.ph-day:disabled {
+  color: var(--ink-2);
+}
+
+.ph-day__num {
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  line-height: 1;
+}
+
+.ph-day.is-today .ph-day__num {
+  background: var(--ink);
+  color: var(--cream);
+  font-weight: 700;
+}
+
+.ph-day.is-selected {
+  box-shadow: inset 0 0 0 2.5px var(--ink);
+}
+
+.ph-day.is-selected:not(.ph-day--none) {
+  box-shadow:
+    inset 0 0 0 2.5px var(--ink),
+    inset 0 0 0 4.5px var(--surface);
+}
+
+.ph-day:focus-visible {
+  outline-offset: 1px;
+  z-index: 1;
+}
+
+.ph-drop {
+  display: block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50% 0 50% 50%;
+  background: var(--drop, var(--pink-deep));
+  transform: rotate(-45deg);
+}
+
+.ph-drop--spot {
+  background: transparent;
+  box-shadow: inset 0 0 0 1.6px var(--drop, var(--pink-deep));
+}
+
+.ph-day__drop {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+}
+
+.ph-logdot {
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ink);
+}
+
+.ph-day__dot {
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  margin-left: -3px;
+}
+
+/* Key */
+
+.ph-cal__key {
+  margin: 12px 6px 2px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.ph-legend {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 12px;
+  font-size: 14px;
+}
+
+.ph-legend li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.ph-legend__sw {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 7px;
+  background: var(--tone);
+}
+
+.ph-legend__sw--predicted {
+  background: var(--surface-2);
+  border: 1.5px dashed var(--ink-2);
+}
+
+.ph-legend__mark {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+}
+
+.ph-legend__today {
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--cream);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.ph-legend__note {
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+/* ---------- Pinned day bar ---------- */
+
+/* Sits just above the floating nav and its raised Check in button. */
+.ph-daybar {
+  position: fixed;
+  z-index: 25;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--nav-bottom) + var(--nav-h) + 30px);
+  width: var(--float-w);
+  max-width: 460px;
+  margin: 0 auto;
+}
+
+.ph-daybar__inner {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  border: 1px solid rgb(var(--ink-rgb) / 0.06);
+  box-shadow:
+    0 14px 34px rgb(var(--shade-rgb) / 0.16),
+    0 2px 6px rgb(var(--shade-rgb) / 0.06);
+}
+
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .ph-daybar__inner {
+    background: rgb(var(--glass-rgb) / 0.84);
+    border-color: var(--glass-edge);
+    -webkit-backdrop-filter: blur(20px) saturate(1.5);
+    backdrop-filter: blur(20px) saturate(1.5);
+  }
+}
+
+.ph-daybar__panel {
+  max-height: min(46dvh, 380px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 16px 16px 8px;
+  border-bottom: 1px solid var(--line);
+}
+
+.ph-daybar__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 8px 8px 6px;
+}
+
+.ph-daybar__toggle {
+  flex: 1;
+  min-width: 0;
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px 4px 10px;
+  border: 0;
+  border-radius: 18px;
+  background: none;
+  text-align: left;
+  color: var(--ink);
+}
+
+.ph-daybar__toggle:focus-visible {
+  outline-offset: -3px;
+}
+
+.ph-daybar__text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+}
+
+.ph-daybar__date {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.ph-daybar__sum {
+  font-size: 14px;
+  color: var(--ink-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ph-daybar__chev {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--surface-2);
+}
+
+.ph-daybar.is-open .ph-daybar__chev {
+  transform: rotate(180deg);
+}
+
+.ph-daybar__phase {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.ph-daybar__empty {
+  color: var(--ink-2);
+  padding-bottom: 8px;
+}
+
+.ph-detail__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.ph-detail__row:last-child {
+  border-bottom: 0;
+}
+
+.ph-detail dt {
+  font-size: 14px;
+  color: var(--ink-2);
+}
+
+.ph-detail dd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  text-align: right;
+}
+
+.ph-meter {
+  display: inline-flex;
+  gap: 2px;
+}
+
+.ph-meter span {
+  width: 5px;
+  height: 12px;
+  border-radius: 3px;
+  background: var(--surface-3);
+}
+
+.ph-meter span.is-on {
+  background: var(--ink);
+}
+
+.ph-detail__meta {
+  margin-top: 6px;
+  padding-bottom: 6px;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ph-daybar__chev {
+    transition: transform 0.2s ease;
+  }
+  .ph-daybar__panel:not([hidden]) {
+    animation: ph-fade 0.18s ease-out;
+  }
+}

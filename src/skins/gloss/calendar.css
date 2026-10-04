@@ -1,0 +1,417 @@
+/* Gloss — Calendar: frosted month card, pastel day tiles, a pinned day bar above the nav. */
+
+/* Room for the pinned day bar so it never covers the last row. */
+.gl-cal {
+  padding-bottom: 92px;
+}
+
+.gl-keybtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 16px 0 12px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--chrome);
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 600;
+  box-shadow:
+    inset 0 0 0 1px rgba(var(--edge-rgb), 0.15),
+    inset 0 1px 0 var(--hi),
+    0 1px 2px rgba(var(--shade-rgb), 0.08);
+}
+
+.gl-keybtn.is-on {
+  box-shadow:
+    inset 0 0 0 2px var(--ink),
+    inset 0 1px 0 var(--hi);
+}
+
+.gl-cal__card {
+  padding: 12px 10px 14px;
+}
+
+.gl-cal__nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.gl-cal__month {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-align: center;
+}
+
+.gl-cal__grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.gl-cal__wd {
+  padding: 4px 0 6px;
+  font-family: var(--font-label);
+  font-weight: var(--label-weight);
+  font-size: 12px;
+  line-height: 1;
+  text-align: center;
+  color: var(--ink-2);
+}
+
+.gl-day {
+  position: relative;
+  min-width: 0;
+  min-height: 44px;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0 6px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: var(--tone);
+  color: var(--ink);
+  box-shadow: inset 0 1px 0 var(--tile-hi);
+}
+
+.gl-day--pad {
+  background: none;
+  box-shadow: none;
+}
+
+.gl-day--none {
+  background: var(--day-empty);
+  box-shadow: inset 0 0 0 1px rgba(var(--edge-rgb), 0.07);
+}
+
+.gl-day.is-predicted {
+  background: var(--tone-tint);
+  box-shadow: none;
+  border: 1.5px dashed var(--tone-deep);
+}
+
+.gl-day__num {
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.gl-day:disabled .gl-day__num {
+  color: var(--ink-2);
+}
+
+.gl-day.is-today .gl-day__num {
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--on-ink);
+  font-weight: 600;
+}
+
+.gl-day.is-selected {
+  box-shadow:
+    inset 0 0 0 2.5px var(--ink),
+    0 4px 10px rgba(var(--shade-rgb), 0.16);
+}
+
+.gl-day:focus-visible {
+  outline-offset: 1px;
+}
+
+.gl-drop {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 0 50% 50% 50%;
+  background: var(--drop);
+  transform: rotate(45deg);
+}
+
+.gl-drop--spot {
+  background: transparent;
+  border: 1.5px solid var(--drop);
+}
+
+.gl-logdot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ink);
+}
+
+.gl-day__drop {
+  position: absolute;
+  left: 7px;
+  bottom: 6px;
+}
+
+.gl-day__dot {
+  position: absolute;
+  right: 7px;
+  bottom: 7px;
+}
+
+@media (max-width: 359px) {
+  .gl-cal__card {
+    padding: 10px 6px 12px;
+  }
+  .gl-cal__grid {
+    gap: 3px;
+  }
+  .gl-day__drop {
+    left: 5px;
+  }
+  .gl-day__dot {
+    right: 5px;
+  }
+}
+
+/* Key (legend), collapsed by default */
+
+.gl-cal__key {
+  margin-top: 12px;
+  padding: 12px 6px 0;
+  border-top: 1px solid var(--line);
+}
+
+.gl-legend {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 12px;
+  font-size: 14px;
+}
+
+.gl-legend li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.gl-legend__sw {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 6px;
+  background: var(--tone);
+}
+
+.gl-legend__sw--predicted {
+  background: var(--tone-tint);
+  border: 1.5px dashed var(--tone-deep);
+}
+
+.gl-legend__mark {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  display: grid;
+  place-items: center;
+}
+
+.gl-legend__today {
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--on-ink);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.gl-legend__note {
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+/* ---------- Pinned day bar ---------- */
+
+.gl-daybar {
+  position: fixed;
+  z-index: 25;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--nav-bottom) + var(--nav-h) + 10px);
+  width: var(--float-w);
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.gl-daybar__inner {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 22px;
+  background: var(--bar-solid);
+  box-shadow:
+    0 0 0 1px rgba(var(--edge-rgb), 0.08),
+    inset 0 1px 0 var(--hi),
+    0 14px 34px rgba(var(--shade-rgb), 0.16),
+    0 2px 6px rgba(var(--shade-rgb), 0.06);
+}
+
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .gl-daybar__inner {
+    background: var(--bar-glass);
+    -webkit-backdrop-filter: blur(22px) saturate(1.5);
+    backdrop-filter: blur(22px) saturate(1.5);
+  }
+}
+
+.gl-daybar__panel {
+  max-height: min(46dvh, 380px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 14px 14px 8px;
+  border-bottom: 1px solid var(--line);
+}
+
+.gl-daybar__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 7px 6px 4px;
+}
+
+.gl-daybar__toggle {
+  flex: 1;
+  min-width: 0;
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px 4px 10px;
+  border: 0;
+  border-radius: 16px;
+  background: none;
+  color: var(--ink);
+  text-align: left;
+}
+
+.gl-daybar__toggle:focus-visible {
+  outline-offset: -3px;
+}
+
+.gl-daybar__text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+}
+
+.gl-daybar__date {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.gl-daybar__sum {
+  font-size: 14px;
+  color: var(--ink-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gl-daybar__chev {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--chrome);
+  box-shadow: inset 0 0 0 1px rgba(var(--edge-rgb), 0.12);
+}
+
+.gl-daybar.is-open .gl-daybar__chev {
+  transform: rotate(180deg);
+}
+
+.gl-daybar__phase {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.gl-daybar__empty {
+  font-size: 15px;
+  color: var(--ink-2);
+}
+
+.gl-detail {
+  display: flex;
+  flex-direction: column;
+}
+
+.gl-detail__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 14px;
+}
+
+.gl-detail__row:last-child {
+  border-bottom: 0;
+}
+
+.gl-detail__row dt {
+  min-width: 0;
+  color: var(--ink-2);
+}
+
+.gl-detail__row dd {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  text-align: right;
+}
+
+.gl-meter {
+  display: inline-flex;
+  gap: 2px;
+}
+
+.gl-meter span {
+  width: 5px;
+  height: 10px;
+  border-radius: 2px;
+  background: var(--surface-3);
+}
+
+.gl-meter span.is-on {
+  background: var(--hot);
+}
+
+.gl-detail__meta {
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .gl-daybar__chev {
+    transition: transform 0.2s ease;
+  }
+}

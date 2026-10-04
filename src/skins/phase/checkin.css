@@ -1,0 +1,355 @@
+/* Phase — the check-in sheet. Dense on purpose: it's filled in every evening. */
+
+.ph-sheet-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-top: calc(env(safe-area-inset-top, 0px) + 10px);
+  background: rgb(var(--shade-rgb) / 0.4);
+}
+
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .ph-sheet-layer {
+    background: rgb(var(--shade-rgb) / 0.3);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+  }
+}
+
+.ph-sheet {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  background: var(--surface);
+  box-shadow: 0 -12px 40px rgb(var(--shade-rgb) / 0.18);
+  outline: none;
+}
+
+.ph-sheet__head {
+  flex: none;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 20px calc(18px + env(safe-area-inset-right, 0px)) 12px calc(20px + env(safe-area-inset-left, 0px));
+}
+
+.ph-sheet__titles {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ph-sheet__title {
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+/* The body scrolls under the frosted Save bar, which floats over its last few pixels. */
+.ph-sheet__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding: 4px calc(14px + env(safe-area-inset-right, 0px)) calc(150px + env(safe-area-inset-bottom, 0px))
+    calc(14px + env(safe-area-inset-left, 0px));
+}
+
+.ph-sheet__foot {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: grid;
+  gap: 8px;
+  padding: 12px calc(16px + env(safe-area-inset-right, 0px)) calc(12px + env(safe-area-inset-bottom, 0px))
+    calc(16px + env(safe-area-inset-left, 0px));
+  background: var(--surface);
+  border-top: 1px solid var(--line);
+}
+
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .ph-sheet__foot {
+    background: rgb(var(--glass-rgb) / 0.8);
+    -webkit-backdrop-filter: blur(18px) saturate(1.4);
+    backdrop-filter: blur(18px) saturate(1.4);
+  }
+}
+
+.ph-sheet__foot .ph-btn {
+  min-height: 56px;
+  font-size: 17px;
+}
+
+.ph-sheet__error {
+  color: var(--pink-deep);
+  font-size: 15px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.ph-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding: 12px 14px;
+  border-radius: 18px;
+  background: var(--yellow-tint);
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.ph-note .ph-icon {
+  flex: none;
+  margin-top: 1px;
+}
+
+.ph-inline-error {
+  display: grid;
+  justify-items: start;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: var(--pink-tint);
+  overflow-wrap: anywhere;
+}
+
+.ph-loading-line {
+  padding: 32px 0;
+  text-align: center;
+  color: var(--ink-2);
+}
+
+.ph-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ph-form__copy {
+  min-height: 48px;
+}
+
+.ph-formcard {
+  padding: 14px 14px 16px;
+  border-radius: 24px;
+  background: var(--card-muted);
+}
+
+.ph-formcard__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.ph-formcard__title {
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.ph-formcard__hint {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--ink-2);
+  text-align: right;
+}
+
+/* Soft pill chips (bleeding, body) */
+
+.ph-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ph-chips--fill .ph-chip-btn {
+  flex: 1 1 auto;
+}
+
+.ph-chip-btn {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1.5px rgb(var(--ink-rgb) / 0.1);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.ph-chip-btn.is-on {
+  background: var(--ink);
+  color: var(--cream);
+  box-shadow: none;
+}
+
+.ph-chip-btn .ph-icon {
+  margin-left: -4px;
+}
+
+/* 1–6 scale: six rounded segments */
+
+.ph-rate + .ph-rate {
+  margin-top: 12px;
+}
+
+.ph-rate__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.ph-rate__label {
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+.ph-rate__value {
+  flex: none;
+  font-size: 14px;
+  color: var(--ink-2);
+}
+
+.ph-rate__scale {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.ph-rate__seg {
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1.5px rgb(var(--ink-rgb) / 0.1);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+.ph-rate__seg.is-filled {
+  background: var(--blue);
+  box-shadow: none;
+  color: var(--blue-on);
+}
+
+.ph-rate__seg.is-on {
+  background: var(--ink);
+  box-shadow: none;
+  color: var(--cream);
+}
+
+/* Segmented control (sleep, energy, cravings) */
+
+.ph-seg-row {
+  display: grid;
+  grid-template-columns: 74px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+}
+
+.ph-seg-row + .ph-seg-row {
+  margin-top: 10px;
+}
+
+.ph-seg-row__label {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.ph-seg {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+  padding: 4px;
+  border-radius: 999px;
+  background: var(--surface-2);
+}
+
+.ph-seg__opt {
+  min-height: 44px;
+  padding: 0 4px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.ph-seg__opt.is-on {
+  background: var(--ink);
+  color: var(--cream);
+}
+
+@media (max-width: 359px) {
+  .ph-sheet__body {
+    padding-left: calc(10px + env(safe-area-inset-left, 0px));
+    padding-right: calc(10px + env(safe-area-inset-right, 0px));
+  }
+  .ph-formcard {
+    padding: 12px 10px 14px;
+  }
+  .ph-rate__scale {
+    gap: 4px;
+  }
+  .ph-chip-btn {
+    padding: 0 12px;
+  }
+  .ph-seg-row {
+    grid-template-columns: 64px minmax(0, 1fr);
+    gap: 6px;
+  }
+  .ph-formcard__hint {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ph-sheet-layer {
+    animation: ph-fade 0.2s ease-out;
+  }
+  .ph-sheet {
+    animation: ph-rise 0.34s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .ph-chip-btn,
+  .ph-rate__seg,
+  .ph-seg__opt {
+    transition: background-color 0.15s ease, color 0.15s ease;
+  }
+}
+
+@keyframes ph-rise {
+  from {
+    transform: translateY(40px);
+    opacity: 0.4;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}

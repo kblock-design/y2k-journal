@@ -1,0 +1,491 @@
+/* Gloss — Home: wordmark, the cycle disc, Check in, streak, daily cards. */
+
+.gl-home {
+  gap: 16px;
+}
+
+/* A soft pink sphere behind the hero, seen through the frosted card (the page clips it). */
+.gl-home__sphere {
+  position: absolute;
+  top: 84px;
+  right: -76px;
+  width: 230px;
+  height: 230px;
+  border-radius: 50%;
+  background: var(--sphere);
+  opacity: var(--sphere-opacity);
+  pointer-events: none;
+}
+
+.gl-home__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 48px;
+}
+
+.gl-datepill {
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: var(--datepill);
+  box-shadow:
+    inset 0 0 0 1px rgba(var(--edge-rgb), 0.08),
+    inset 0 1px 0 var(--hi);
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* Welcome (no logs yet) */
+
+.gl-welcome {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.gl-welcome__title {
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.gl-welcome__text {
+  color: var(--ink-2);
+}
+
+.gl-welcome__text--small {
+  font-size: 15px;
+}
+
+/* ---------- Hero: the disc ---------- */
+
+.gl-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 20px 18px 16px;
+}
+
+.gl-disc {
+  position: relative;
+  width: min(300px, 100%);
+  aspect-ratio: 1;
+  margin: 0 auto;
+  container-type: inline-size;
+}
+
+/* The silver plate with a CD's rainbow light-catch. Its inset comes from DISC (ring.ts). */
+.gl-disc__plate {
+  position: absolute;
+  border-radius: 50%;
+  background: var(--disc-plate);
+  box-shadow:
+    0 0 0 1px rgba(var(--edge-rgb), 0.1),
+    inset 0 1px 1px var(--hi),
+    0 14px 30px rgba(var(--shade-rgb), 0.12),
+    0 2px 4px rgba(var(--shade-rgb), 0.06);
+}
+
+.gl-disc__svg {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.gl-disc__grooves circle {
+  stroke: var(--groove-light);
+  stroke-width: 1;
+}
+
+.gl-disc__grooves circle:nth-child(even) {
+  stroke: var(--groove-dark);
+}
+
+.gl-disc__band {
+  stroke: var(--groove-dark);
+}
+
+.gl-arc--solid.gl-arc--menstrual {
+  stroke: var(--pink);
+}
+.gl-arc--solid.gl-arc--follicular {
+  stroke: var(--sky);
+}
+.gl-arc--solid.gl-arc--ovulation {
+  stroke: var(--butter);
+}
+.gl-arc--solid.gl-arc--luteal {
+  stroke: var(--mint);
+}
+.gl-arc--tint.gl-arc--menstrual {
+  stroke: var(--pink-tint);
+}
+.gl-arc--tint.gl-arc--follicular {
+  stroke: var(--sky-tint);
+}
+.gl-arc--tint.gl-arc--ovulation {
+  stroke: var(--butter-tint);
+}
+.gl-arc--tint.gl-arc--luteal {
+  stroke: var(--mint-tint);
+}
+.gl-arc--unknown {
+  stroke: var(--surface-3);
+}
+.gl-arc--dot {
+  stroke: none !important;
+}
+.gl-arc--dot.gl-arc--solid.gl-arc--menstrual {
+  fill: var(--pink);
+}
+.gl-arc--dot.gl-arc--solid.gl-arc--follicular {
+  fill: var(--sky);
+}
+.gl-arc--dot.gl-arc--solid.gl-arc--ovulation {
+  fill: var(--butter);
+}
+.gl-arc--dot.gl-arc--solid.gl-arc--luteal {
+  fill: var(--mint);
+}
+.gl-arc--dot.gl-arc--tint.gl-arc--menstrual {
+  fill: var(--pink-tint);
+}
+.gl-arc--dot.gl-arc--tint.gl-arc--follicular {
+  fill: var(--sky-tint);
+}
+.gl-arc--dot.gl-arc--tint.gl-arc--ovulation {
+  fill: var(--butter-tint);
+}
+.gl-arc--dot.gl-arc--tint.gl-arc--luteal {
+  fill: var(--mint-tint);
+}
+.gl-arc--dot.gl-arc--unknown {
+  fill: var(--surface-3);
+}
+
+/* The LCD in the hub; its box (38% × 27% of the disc) comes from DISC in ring.ts. */
+.gl-disc__hub {
+  position: absolute;
+  display: flex;
+}
+
+.gl-lcd--xl {
+  width: 100%;
+  height: 100%;
+}
+
+.gl-lcd--xl .gl-lcd__face {
+  width: 100%;
+  height: 100%;
+  padding: 4px 6px;
+  gap: 2px;
+  border-radius: 14px;
+}
+
+.gl-lcd--xl .gl-lcd__digits {
+  font-size: 54px;
+  font-size: 18cqw;
+  line-height: 0.82;
+}
+
+.gl-disc--preview .gl-disc__svg {
+  opacity: 0.85;
+}
+
+.gl-hero__meta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.gl-hero__empty-title {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.gl-hero__note {
+  max-width: 32ch;
+  font-size: 15px;
+  color: var(--ink-2);
+}
+
+.gl-next {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px 8px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.gl-next .gl-icon {
+  color: var(--hot-deep);
+}
+
+.gl-next.is-late {
+  color: var(--hot-deep);
+  font-weight: 600;
+}
+
+.gl-disc-key {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px 12px;
+}
+
+.gl-disc-key__item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 7px;
+  min-width: 0;
+  font-size: 14px;
+  line-height: 1.3;
+}
+
+.gl-disc-key__name {
+  font-weight: 600;
+}
+
+.gl-disc-key__days {
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+/* ---------- Check in / done ---------- */
+
+.gl-gel--hero {
+  display: grid;
+  grid-template-columns: 48px 1fr 48px;
+  width: 100%;
+  min-height: 68px;
+  padding: 0 10px;
+  font-size: 19px;
+  letter-spacing: -0.01em;
+}
+
+.gl-gel--hero::before {
+  left: 18px;
+  right: 18px;
+}
+
+.gl-gel__bead {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--on-orb);
+  background: var(--orb-fill);
+  box-shadow:
+    inset 0 0 0 1px var(--orb-rim),
+    inset 0 2px 0 rgba(255, 255, 255, 0.45);
+}
+
+.gl-gel__stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.15;
+}
+
+.gl-gel__sub {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--on-gel-2);
+}
+
+/* Done: the LOGGED stamp is the headline; Edit today sits beside it, the note below. */
+.gl-done {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'head edit'
+    'text text';
+  align-items: center;
+  column-gap: 12px;
+  row-gap: 8px;
+  padding: 16px 16px 16px 18px;
+}
+
+.gl-done__head {
+  grid-area: head;
+  min-width: 0;
+  margin: 0;
+  line-height: 0;
+}
+
+.gl-done__head .gl-stamp {
+  width: 140px;
+  height: 59px;
+  margin: 2px 0 0 2px;
+  transform: rotate(-4deg);
+}
+
+.gl-done__edit {
+  grid-area: edit;
+}
+
+.gl-done__text {
+  grid-area: text;
+  font-size: 15px;
+  line-height: 1.4;
+  color: var(--ink-2);
+}
+
+@media (max-width: 359px) {
+  .gl-done__head .gl-stamp {
+    width: 118px;
+    height: 50px;
+  }
+}
+
+/* ---------- Streak ---------- */
+
+.gl-streak {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.gl-streak__row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.gl-streak__text {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.gl-streak__note {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.gl-streak__sub {
+  font-size: 14px;
+  color: var(--ink-2);
+}
+
+.gl-week {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+  padding: 10px 10px 9px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  box-shadow: inset 0 1px 2px rgba(var(--shade-rgb), 0.07);
+}
+
+.gl-week__day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.gl-week__letter {
+  font-family: var(--font-label);
+  font-size: 12px;
+  font-weight: var(--label-weight);
+  line-height: 1;
+  color: var(--ink-2);
+}
+
+.gl-week__pip {
+  width: 100%;
+  max-width: 30px;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--surface-3);
+  box-shadow: inset 0 1px 1px rgba(var(--shade-rgb), 0.12);
+}
+
+.gl-week__day.is-logged .gl-week__pip {
+  background: linear-gradient(180deg, var(--hot-gel-1) 0%, var(--hot-gel-2) 50%, var(--hot-gel-3) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    0 0 0 1px rgba(var(--hot-rim-rgb), 0.2);
+}
+
+.gl-week__day.is-today .gl-week__letter {
+  color: var(--ink);
+}
+
+.gl-week__day.is-today:not(.is-logged) .gl-week__pip {
+  background: transparent;
+  box-shadow: none;
+  border: 1.5px dashed var(--hot-deep);
+}
+
+/* ---------- Daily cards ---------- */
+
+/* The daily quote on a blush sticky note, held by a strip of clear tape. Plain Outfit text. */
+.gl-sticky {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 8px 6px 2px;
+  padding: 24px 20px 18px;
+  border-radius: 3px;
+  background: var(--sticky);
+  box-shadow:
+    0 1px 1px rgba(var(--shade-rgb), 0.06),
+    0 14px 22px -10px rgba(var(--shade-rgb), 0.28);
+  transform: rotate(-1deg);
+}
+
+.gl-sticky__tape {
+  position: absolute;
+  top: -11px;
+  left: 50%;
+  width: 92px;
+  height: 24px;
+  margin-left: -46px;
+  border-radius: 2px;
+  background: var(--tape);
+  box-shadow:
+    inset 0 0 0 1px var(--tape-rim),
+    0 1px 2px rgba(var(--shade-rgb), 0.1);
+  transform: rotate(-3deg);
+}
+
+.gl-sticky__text {
+  font-size: 19px;
+  font-weight: 500;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+}
+
+.gl-sticky__by {
+  font-size: 14px;
+  color: var(--ink-2);
+}
+
+.gl-fact {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.gl-fact__text {
+  font-size: 16px;
+}

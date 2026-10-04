@@ -1,0 +1,456 @@
+/* Gloss — Settings: grouped frosted lists, chrome row icons, the theme switcher. */
+
+.gl-settings {
+  gap: 20px;
+}
+
+.gl-group__title {
+  padding: 0 6px 8px;
+}
+
+.gl-group__list {
+  overflow: hidden;
+  border-radius: 22px;
+  background: var(--card-solid);
+  box-shadow:
+    0 0 0 1px var(--card-border),
+    var(--shadow-card);
+}
+
+.gl-group__note {
+  padding: 8px 6px 0;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+.gl-row {
+  position: relative;
+  width: 100%;
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  text-align: left;
+}
+
+.gl-row + .gl-row::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 66px;
+  right: 0;
+  height: 1px;
+  background: var(--line);
+}
+
+.gl-row--note {
+  align-items: flex-start;
+  padding-top: 14px;
+  padding-bottom: 14px;
+}
+
+.gl-row--button:active:not(:disabled) {
+  background: var(--surface-2);
+}
+
+.gl-row--button:disabled {
+  opacity: 0.55;
+}
+
+.gl-row--button:focus-visible {
+  outline-offset: -3px;
+}
+
+.gl-row__main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.gl-row__title {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+.gl-row__sub {
+  font-size: 13px;
+  line-height: 1.35;
+  color: var(--ink-2);
+}
+
+.gl-row__chev {
+  color: var(--ink-2);
+}
+
+.gl-rowicon {
+  flex: none;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--chrome);
+  color: var(--ink);
+  box-shadow:
+    inset 0 0 0 1px rgba(var(--edge-rgb), 0.13),
+    inset 0 1px 0 var(--hi);
+}
+
+.gl-privacy {
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.gl-input {
+  min-height: 44px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  color: var(--ink);
+  font-size: 16px; /* no iOS zoom */
+  font-weight: 500;
+  box-shadow: inset 0 1px 2px rgba(var(--shade-rgb), 0.1);
+}
+
+.gl-input--time {
+  flex: none;
+  width: 138px;
+}
+
+.gl-input--num {
+  width: 62px;
+  text-align: center;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.gl-input--num::-webkit-inner-spin-button,
+.gl-input--num::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.gl-input-wrap {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.gl-input-wrap__unit {
+  font-size: 14px;
+  color: var(--ink-2);
+}
+
+/* Theme switcher */
+
+.gl-skin.is-on {
+  background: linear-gradient(90deg, rgba(var(--hot-tint-rgb), 0.7), rgba(var(--hot-tint-rgb), 0));
+}
+
+.gl-skin__badge {
+  flex: none;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--chrome);
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 700;
+  box-shadow: inset 0 0 0 1px rgba(var(--edge-rgb), 0.13);
+}
+
+.gl-skin__badge--gloss {
+  color: var(--on-hot);
+  background: radial-gradient(120% 95% at 50% 0%, var(--hot-gel-1) 0%, var(--hot-gel-2) 46%, var(--hot-gel-3) 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(var(--hot-rim-rgb), 0.3),
+    inset 0 2px 0 rgba(255, 255, 255, 0.5);
+}
+
+.gl-skin__mark {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1.5px rgba(var(--edge-rgb), 0.22);
+}
+
+.gl-skin.is-on .gl-skin__mark {
+  background: var(--ink);
+  color: var(--on-ink);
+  box-shadow: none;
+}
+
+/* Colour picker (Appearance): five swatches under the row title. Each chip is a tiny preview
+ * of its colourway (page colour, a card with an ink line and accent dot, a gel pill); its
+ * colours come from .gl-swatch--<key> in colourways.css. */
+
+.gl-colour {
+  flex-wrap: wrap;
+  row-gap: 10px;
+  padding-bottom: 14px;
+}
+
+/* A row whose control sits on its own line underneath (mood tracking: Off / Basic / Advanced). */
+.gl-row--wrap {
+  flex-wrap: wrap;
+  row-gap: 10px;
+  padding-bottom: 14px;
+}
+
+.gl-row--wrap > .gl-seg {
+  flex: 1 0 100%;
+}
+
+.gl-colour__grid {
+  flex: 1 0 100%;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.gl-swatch {
+  min-width: 0;
+  min-height: 62px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 0 0;
+  border: 0;
+  border-radius: 14px;
+  background: none;
+  color: var(--ink-2);
+}
+
+.gl-swatch__chip {
+  position: relative;
+  display: block;
+  width: 100%;
+  max-width: 64px;
+  height: 38px;
+  overflow: hidden;
+  border-radius: 11px;
+  background: var(--sw-bg);
+  box-shadow: inset 0 0 0 1px rgba(var(--edge-rgb), 0.16);
+}
+
+.gl-swatch__card {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  right: 6px;
+  height: 15px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 5px;
+  border-radius: 5px;
+  background: var(--sw-card);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
+}
+
+.gl-swatch__ink {
+  flex: 1;
+  min-width: 0;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--sw-ink);
+}
+
+.gl-swatch__dot {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--sw-accent);
+}
+
+.gl-swatch__gel {
+  position: absolute;
+  left: 6px;
+  bottom: 5px;
+  width: 26px;
+  height: 9px;
+  border-radius: 999px;
+  background: var(--sw-gel);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    0 0 0 1px rgba(0, 0, 0, 0.12);
+}
+
+.gl-swatch__label {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.2;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.gl-swatch.is-on {
+  color: var(--ink);
+}
+
+.gl-swatch.is-on .gl-swatch__chip {
+  box-shadow:
+    inset 0 0 0 1px rgba(var(--edge-rgb), 0.16),
+    0 0 0 2px var(--surface),
+    0 0 0 4px var(--ink);
+}
+
+.gl-swatch.is-on .gl-swatch__label {
+  font-weight: 700;
+}
+
+/* On/off switch (Appearance): recessed track, chrome thumb; hot-pink gel when on. */
+.gl-switch-ctl {
+  position: relative;
+  flex: none;
+  width: 52px;
+  height: 32px;
+  border-radius: 999px;
+  background: var(--switch-track);
+  box-shadow:
+    inset 0 0 0 1.5px rgba(var(--edge-rgb), 0.4),
+    inset 0 1px 3px rgba(var(--shade-rgb), 0.18);
+}
+
+.gl-switch-ctl__thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--chrome);
+  box-shadow:
+    0 0 0 1px rgba(var(--edge-rgb), 0.2),
+    0 2px 4px rgba(var(--shade-rgb), 0.22);
+}
+
+.gl-switch-ctl.is-on {
+  background: linear-gradient(180deg, var(--hot-light) 0%, var(--hot) 55%, var(--hot-gel-3) 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(var(--hot-rim-rgb), 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.45);
+}
+
+.gl-switch-ctl.is-on .gl-switch-ctl__thumb {
+  left: 23px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .gl-switch-ctl,
+  .gl-switch-ctl__thumb {
+    transition:
+      left 0.18s ease,
+      background-color 0.18s ease;
+  }
+}
+
+.gl-about {
+  padding: 0 6px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+
+@media (max-width: 359px) {
+  .gl-row > .gl-rowicon {
+    display: none;
+  }
+  .gl-row + .gl-row::before {
+    left: 16px;
+  }
+}
+
+/* Import confirmation */
+
+.gl-confirm-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: max(24px, env(safe-area-inset-top, 0px)) 20px max(24px, env(safe-area-inset-bottom, 0px));
+  background: rgba(var(--shade-rgb), 0.42);
+}
+
+.gl-confirm {
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 24px 20px 20px;
+  border-radius: 28px;
+  background: var(--dialog-bg);
+  text-align: center;
+  outline: none;
+  box-shadow:
+    inset 0 1px 0 var(--hi),
+    0 0 0 1px rgba(var(--edge-rgb), 0.06),
+    0 20px 50px rgba(var(--shade-rgb), 0.25);
+}
+
+.gl-confirm__title {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.gl-confirm__file {
+  max-width: 100%;
+  padding: 2px 12px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gl-confirm__text {
+  font-size: 15px;
+  color: var(--ink-2);
+}
+
+.gl-confirm__actions {
+  width: 100%;
+  display: grid;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .gl-confirm {
+    animation: gl-pop 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+}
+
+@keyframes gl-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}

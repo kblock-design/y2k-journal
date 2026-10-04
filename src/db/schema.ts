@@ -23,6 +23,13 @@ export class TrackerDB extends Dexie {
     // Schema history. Never edit a released version in place: add a new
     // `this.version(n + 1).stores({...}).upgrade(tx => ...)` below it.
     // Only indexed fields are listed; every other field is stored as-is.
+    //
+    // Mood tracking levels (Settings.moodTracking, and DayLog.moods holding only the rated
+    // moods) deliberately did NOT bump this: neither field is indexed, old rows (the original
+    // eight moods, settings without moodTracking) are read as-is and getSettings() fills the new
+    // setting from DEFAULT_SETTINGS. Adding a mood (selfCriticism) needed no bump either: rows
+    // saved before it simply lack the key, which reads as "not recorded".
+    // See src/db/stability.test.ts.
     this.version(1).stores({
       logs: 'date', // one row per local calendar day
       pets: '++id', // auto-increment; the living pet has diedOn === null (null is not indexable)

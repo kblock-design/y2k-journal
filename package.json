@@ -12,6 +12,12 @@
     "stage-public": "node scripts/stage-public.mjs"
   },
   "dependencies": {
+    "@fontsource/bagel-fat-one": "^5.3.0",
+    "@fontsource/orbitron": "^5.3.0",
+    "@fontsource/outfit": "^5.3.0",
+    "@fontsource/pacifico": "^5.3.0",
+    "@fontsource/silkscreen": "^5.3.0",
+    "@fontsource/vt323": "^5.3.0",
     "dexie": "^4.4.6",
     "dexie-react-hooks": "^4.4.0",
     "react": "^19.2.8",

@@ -7,6 +7,7 @@ const settings = (over: Partial<Settings> = {}): Settings => ({
   defaultCycleLength: 28,
   defaultPeriodLength: 5,
   startedOn: '2026-09-01',
+  moodTracking: 'advanced',
   ...over,
 })
 

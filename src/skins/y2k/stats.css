@@ -1,0 +1,922 @@
+/* Stats tab. Every class is prefixed `stats-`; colours come from the shared tokens in
+   y2k.css so the app-wide restyle carries through. Charts are plain CSS boxes.
+   Layout: a pinned view switch, then one or two windows per view. Each block is a title,
+   the key number or chart, and one caption line. */
+
+.stats {
+  gap: var(--space-4);
+}
+
+.stats-win > .win__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+}
+
+/* ---------- View switch (pinned under the status bar) ---------- */
+
+.stats-switch {
+  position: sticky;
+  top: var(--safe-top);
+  z-index: 5;
+  display: flex;
+  gap: 2px;
+  padding: 2px;
+  background: var(--ink);
+  border: 2px solid var(--ink);
+  border-radius: var(--radius-sm);
+  /* the strip above it (under the notch) gets a solid fill so content scrolls under cleanly */
+  box-shadow:
+    var(--drop-hard),
+    0 calc(-1 * var(--safe-top) - 2px) 0 0 var(--desktop-bg-color);
+}
+
+.stats-switch__btn {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: var(--tap-min);
+  padding: 4px 6px;
+  border: 0;
+  border-radius: 2px;
+  background: var(--chrome-key);
+  box-shadow: var(--bevel-btn);
+  color: var(--ink);
+  font-family: var(--font-pixel);
+  font-size: var(--pixel-sm);
+  line-height: 1.15;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.stats-switch__btn:active:not(.is-selected) {
+  box-shadow: var(--bevel-btn-pressed);
+}
+
+.stats-switch__btn.is-selected {
+  background: linear-gradient(180deg, #3a3842 0%, var(--ink) 55%, #000 100%);
+  color: var(--white);
+  text-shadow: 1px 1px 0 var(--plum);
+  box-shadow: var(--bevel-btn-pressed), inset 0 -3px 0 var(--pink-hot);
+}
+
+/* ---------- Shared text ---------- */
+
+.stats-note {
+  font-size: var(--font-size-xs);
+  line-height: 1.1;
+  color: var(--color-text-muted);
+}
+
+.stats-sub {
+  margin-top: var(--space-2);
+  padding-bottom: 3px;
+  font-family: var(--font-pixel);
+  font-size: var(--pixel-md);
+  line-height: 1.2;
+  color: var(--color-text);
+  border-bottom: 2px dotted var(--color-border);
+}
+
+.stats-sub:first-child {
+  margin-top: 0;
+}
+
+.stats-basis {
+  font-size: var(--font-size-sm);
+  line-height: 1.1;
+}
+
+.stats-tag {
+  display: inline-block;
+  margin-right: 4px;
+  padding: 2px 8px;
+  font-family: var(--font-pixel);
+  font-size: var(--pixel-sm);
+  line-height: 1.2;
+  vertical-align: 2px;
+  color: var(--color-text);
+  background: var(--butter);
+  border: 2px dashed var(--color-border-strong);
+  border-radius: var(--radius-pill);
+}
+
+/* Text button that jumps to another view; a full-height tap target. */
+.stats-more {
+  margin-top: calc(var(--space-1) * -1);
+}
+
+.stats-more__btn.btn--inline {
+  align-self: flex-start;
+  min-height: var(--tap-min);
+  font-size: var(--font-size-sm);
+  text-align: left;
+}
+
+/* "Not yet" panel */
+.stats-locked {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-surface-alt);
+  box-shadow: var(--bevel-in);
+}
+
+.stats-locked__icon {
+  margin-top: 2px;
+}
+
+.stats-locked__text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+  font-size: var(--font-size-sm);
+  line-height: 1.1;
+}
+
+/* ---------- Stat tiles ---------- */
+
+.stats-tiles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.stats-tiles--3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.stats-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  padding: 6px var(--space-2);
+  background: var(--color-surface);
+  border: 2px solid var(--color-border-strong);
+  box-shadow: var(--bevel-btn);
+}
+
+.stats-tile--wide {
+  grid-column: 1 / -1;
+}
+
+.stats-tile__label {
+  font-family: var(--font-pixel);
+  font-size: var(--pixel-sm);
+  line-height: 1.2;
+  color: var(--color-text-muted);
+  overflow-wrap: anywhere;
+}
+
+.stats-tile__data {
+  margin: 0;
+  min-width: 0;
+}
+
+.stats-tile__value {
+  font-family: var(--font-display);
+  font-size: var(--font-size-xl);
+  line-height: 1;
+  color: var(--color-accent);
+}
+
+.stats-tiles--3 .stats-tile__value {
+  font-size: var(--font-size-lg);
+}
+
+.stats-tile__value--word,
+.stats-tiles--3 .stats-tile__value--word {
+  font-size: var(--font-size-md);
+  line-height: 1.05;
+}
+
+.stats-tiles--3 .stats-tile__value--word {
+  font-size: var(--font-size-sm);
+}
+
+.stats-tile.is-muted .stats-tile__value {
+  color: var(--color-text-muted);
+}
+
+.stats-tile__unit {
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+}
+
+.stats-tile__note {
+  display: block;
+  margin-top: 2px;
+  font-size: var(--font-size-xs);
+  line-height: 1.05;
+  color: var(--color-text-muted);
+}
+
+/* ---------- Zero-log empty state ---------- */
+
+.stats-empty__title {
+  font-family: var(--font-display);
+  font-size: var(--font-size-xl);
+  line-height: 1;
+  color: var(--color-accent);
+}
+
+.stats-empty__lead {
+  font-size: var(--font-size-md);
+  line-height: 1.1;
+}
+
+.stats-steps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stats-steps li {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-start;
+  font-size: var(--font-size-sm);
+  line-height: 1.1;
+}
+
+.stats-steps__num {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  font-family: var(--font-pixel);
+  font-size: var(--pixel-md);
+  color: var(--color-accent-text);
+  background: var(--color-accent);
+  border: 2px solid var(--color-border-strong);
+}
+
+/* ---------- Overview: headline ---------- */
+
+.stats-head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding-bottom: var(--space-2);
+  border-bottom: 2px dotted var(--color-border);
+}
+
+.stats-head__row {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.stats-head__badge {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 82px;
+  min-height: 70px;
+  padding: 4px 2px;
+  background: var(--color-accent);
+  border: 2px solid var(--color-border-strong);
+  box-shadow: var(--drop-hard);
+  transform: rotate(-3deg);
+}
+
+.stats-head__num {
+  font-family: var(--font-display);
+  font-size: var(--font-size-xl);
+  line-height: 1;
+  color: var(--color-accent-text);
+  text-shadow: 2px 2px 0 var(--plum);
+  white-space: nowrap;
+}
+
+.stats-head__unit {
+  margin-top: 3px;
+  font-family: var(--font-pixel);
+  font-size: var(--pixel-sm);
+  line-height: 1.1;
+  color: var(--color-accent-text);
+}
+
+.stats-head__title {
+  min-width: 0;
+  font-size: var(--font-size-md);
+  line-height: 1.05;
+}
+
+.stats-head__title strong {
+  font-weight: var(--font-weight-normal);
+  color: var(--color-accent);
+}
+
+.stats-head__sub {
+  font-size: var(--font-size-xs);
+  line-height: 1.1;
+  color: var(--color-text-muted);
+}
+
+/* ---------- Overview: one line per highlight ---------- */
+
+.stats-hl {
+  display: flex;
+  flex-direction: column;
+}
+
+.stats-hl__item {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  padding: 5px 0;
+  border-bottom: 1px dotted var(--color-border);
+}
+
+.stats-hl__item:last-child {
+  border-bottom: 0;
+}
+
+.stats-hl__badge {
+  flex-shrink: 0;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 3px;
+  min-width: 84px;
+  padding: 3px 4px;
+  background: var(--lilac-soft);
+  border: 2px solid var(--color-border-strong);
+}
+
+.stats-hl__num {
+  font-family: var(--font-display);
+  font-size: var(--font-size-sm);
+  line-height: 1;
+  color: var(--color-accent);
+  white-space: nowrap;
+}
+
+.stats-hl__unit {
+  font-family: var(--font-pixel);
+  font-size: var(--pixel-sm);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.stats-hl__text {
+  min-width: 0;
+  font-size: var(--font-size-xs);
+  line-height: 1.05;
+}
+
+.stats-hl__text strong {
+  font-weight: var(--font-weight-normal);
+  color: var(--color-accent);
+}
+
+/* Unlock checklist */
+.stats-unlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.stats-unlock__lead {
+  font-size: var(--font-size-sm);
+  line-height: 1.1;
+}
+
+.stats-unlock__list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stats-unlock__step {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-start;
+  font-size: var(--font-size-sm);
+  line-height: 1.05;
+}
+
+.stats-unlock__box {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  background: var(--white);
+  box-shadow: var(--bevel-in);
+  border: 1px solid var(--color-border-strong);
+}
+
+.stats-unlock__step.is-done .stats-unlock__label {
+  color: var(--color-text-muted);
+  text-decoration: line-through;
+  text-decoration-color: var(--color-accent);
+}
+
+.stats-unlock__note {
+  display: block;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+/* ---------- Cycle history chart ---------- */
+
+.stats-chart {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+}
+
+.stats-chart__key-line {
+  display: inline-block;
+  width: 16px;
+  vertical-align: middle;
+  border-top: 2px dashed var(--color-text-muted);
+}
+
+.stats-chart__plot {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 3px;
+  height: 96px;
+  margin-top: 18px; /* room for the value labels above the tallest bar */
+  padding: 0 2px;
+  border-bottom: 2px solid var(--color-border-strong);
+}
+
+.stats-chart__col {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  flex: 1 1 0;
+  max-width: 34px;
+  height: 100%;
+}
+
+.stats-chart__bar {
+  position: relative;
+  width: 100%;
+  min-height: 4px;
+  background: var(--pink-hot);
+  border: 2px solid var(--color-border-strong);
+  border-bottom: 0;
+  box-shadow: inset 2px 2px 0 rgba(255, 255, 255, 0.55);
+}
+
+.stats-chart__val {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding-bottom: 2px;
+  font-family: var(--font-pixel);
+  font-size: var(--pixel-sm);
+  line-height: 1;
+  color: var(--color-text);
+}
+
+.stats-chart__typical {
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  border-top: 2px dashed var(--color-text-muted);
+  pointer-events: none;
+}
+
+.stats-chart__axis {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--font-size-xs);
+  line-height: 1;
+  color: var(--color-text-muted);
+}
+
+/* ---------- Before vs after: one compact row per mood ---------- */
+
+.stats-db-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+  font-family: var(--font-pixel);
+  font-size: var(--pixel-sm);
+  line-height: 1.2;
+}
+
+.stats-db-legend__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.stats-db-list {
+  display: flex;
+  flex-direction: column;
+}
+
+/* label + meta | 1–6 track | difference */
+.stats-db {
+  display: grid;
+  grid-template-columns: minmax(0, 42%) minmax(0, 1fr) 3.1em;
+  align-items: center;
+  gap: 2px var(--space-2);
+  padding: 4px 0;
+  font-size: var(--font-size-xs);
+  border-bottom: 1px dotted var(--color-border);
+}
+
+.stats-db:last-child {
+  border-bottom: 0;
+}
+
+.stats-db--scale {
+  padding: 0;
+  border-bottom: 0;
+}
+
+.stats-db-scale {
+  display: flex;
+  justify-content: space-between;
+  margin: 0 3px;
+  font-family: var(--font-pixel);
+  font-size: var(--pixel-sm);
+  line-height: 1;
+  color: var(--color-text-muted);
+}
+
+.stats-db--total {
+  margin: 2px 0;
+  padding: 4px 6px;
+  background: var(--color-surface-alt);
+  border: 2px solid var(--color-border-strong);
+}
+
+.stats-db__name {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.stats-db__label {
+  line-height: 1;
+  overflow-wrap: anywhere;
+}
+
+.stats-db--total .stats-db__label {
+  font-family: var(--font-pixel);
+  font-size: var(--pixel-sm);
+  line-height: 1.2;
+}
+
+.stats-db__meta {
+  font-family: var(--font-pixel);
+  font-size: var(--pixel-xs);
+  line-height: 1.25;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.stats-db__diff {
+  font-family: var(--font-display);
+  font-size: var(--font-size-xs);
+  line-height: 1;
+  text-align: right;
+  white-space: nowrap;
+  color: var(--color-text-muted);
+}
+
+.stats-db__diff.is-up {
+  color: var(--color-accent);
+}
+
+.stats-db__none {
+  grid-column: 2 / -1;
+  line-height: 1;
+  color: var(--color-text-muted);
+}
+
+.stats-db.is-missing .stats-db__label {
+  color: var(--color-text-muted);
+}
+
+/* The 1–6 track: a groove with a tick at every step. */
+.stats-db__track {
+  position: relative;
+  height: 18px;
+  margin: 0 7px;
+  background:
+    linear-gradient(var(--color-border), var(--color-border)) 0 50% / 100% 2px no-repeat,
+    repeating-linear-gradient(90deg, var(--color-border) 0 2px, transparent 2px calc(20% - 0.4px)) 0 50% /
+      calc(100% + 2px) 8px no-repeat;
+}
+
+.stats-db__link {
+  position: absolute;
+  top: 50%;
+  height: 6px;
+  transform: translateY(-50%);
+  background: var(--color-accent);
+  opacity: 0.55;
+}
+
+.stats-db__dot {
+  position: absolute;
+  top: 50%;
+  width: 13px;
+  height: 13px;
+  transform: translate(-50%, -50%);
+  border: 2px solid var(--color-border-strong);
+}
+
+.stats-db__dot--before {
+  z-index: 2;
+  background: var(--pink-hot);
+  box-shadow: 2px 2px 0 var(--plum);
+}
+
+.stats-db__dot--after {
+  z-index: 1;
+  background: var(--white);
+  border-radius: 50%;
+}
+
+.stats-db__dot--static {
+  position: static;
+  display: inline-block;
+  flex-shrink: 0;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Period-by-period breakdown */
+.stats-pairs {
+  border: 2px solid var(--color-border-strong);
+  background: var(--color-surface);
+  box-shadow: var(--drop-hard);
+}
+
+.stats-pairs__summary {
+  display: flex;
+  align-items: center;
+  min-height: var(--tap-min);
+  padding: 0 var(--space-3);
+  font-family: var(--font-pixel);
+  font-size: var(--pixel-md);
+  line-height: 1.2;
+  cursor: pointer;
+  background: var(--win-face);
+  box-shadow: var(--bevel-btn);
+}
+
+.stats-pairs[open] .stats-pairs__summary {
+  box-shadow: var(--bevel-btn-pressed);
+}
+
+.stats-pairs__list {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-2);
+}
+
+.stats-pairs__item {
+  display: grid;
+  grid-template-columns: 4.2em minmax(0, 1fr);
+  gap: var(--space-2);
+  padding: 4px 0;
+  font-size: var(--font-size-xs);
+  line-height: 1.05;
+  border-bottom: 1px dotted var(--color-border);
+}
+
+.stats-pairs__item:last-child {
+  border-bottom: 0;
+}
+
+.stats-pairs__date {
+  color: var(--color-accent);
+}
+
+.stats-pairs__item.is-skipped .stats-pairs__what {
+  color: var(--color-text-muted);
+}
+
+/* ---------- Heat tables (mood by phase, symptoms by phase, levels) ---------- */
+
+.stats-heat {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 2px;
+  font-size: var(--font-size-xs);
+  line-height: 1;
+}
+
+.stats-heat th,
+.stats-heat td {
+  padding: 3px 2px;
+  font-weight: var(--font-weight-normal);
+}
+
+.stats-heat__corner {
+  width: 40%;
+  text-align: left;
+  font-family: var(--font-pixel);
+  font-size: var(--pixel-sm);
+  color: var(--color-text-muted);
+}
+
+.stats-heat--body .stats-heat__corner,
+.stats-heat--levels .stats-heat__corner {
+  width: 32%;
+}
+
+.stats-heat__phase {
+  font-family: var(--font-pixel);
+  font-size: var(--pixel-sm);
+  text-align: center;
+  color: var(--color-text);
+  border: 2px solid var(--color-border-strong);
+}
+
+.stats-heat__phase--menstrual {
+  background: var(--phase-menstrual);
+}
+.stats-heat__phase--follicular {
+  background: var(--phase-follicular);
+}
+.stats-heat__phase--ovulation {
+  background: var(--phase-ovulation);
+}
+.stats-heat__phase--luteal {
+  background: var(--phase-luteal);
+}
+.stats-heat__phase--all {
+  background: var(--color-surface-alt);
+}
+
+.stats-heat__row {
+  text-align: left;
+  overflow-wrap: anywhere;
+  color: var(--color-text);
+}
+
+.stats-heat__cell {
+  text-align: center;
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+  background: color-mix(in srgb, var(--pink-hot) var(--stats-heat, 0%), var(--color-surface));
+  border: 1px solid var(--color-border);
+}
+
+.stats-heat__cell--pct {
+  font-size: var(--font-size-xs);
+}
+
+.stats-heat__cell.is-zero {
+  color: var(--color-text-muted);
+}
+
+.stats-heat__cell.is-strong {
+  border-color: var(--color-border-strong);
+}
+
+.stats-heat__cell.is-empty {
+  color: var(--color-text-muted);
+  background: transparent;
+}
+
+.stats-heat .is-thin {
+  opacity: 0.45;
+  border-style: dashed;
+}
+
+.stats-heat__total .stats-heat__row,
+.stats-heat__total .stats-heat__cell {
+  border-top: 2px solid var(--color-border-strong);
+}
+
+.stats-heat__total .stats-heat__row {
+  font-family: var(--font-pixel);
+  font-size: var(--pixel-sm);
+}
+
+.stats-heat tfoot th {
+  font-family: var(--font-pixel);
+  font-size: var(--pixel-sm);
+  color: var(--color-text-muted);
+}
+
+.stats-heat__days {
+  text-align: center;
+  color: var(--color-text-muted);
+}
+
+/* Sleep / energy / cravings: one small stacked column per phase, lightest level at the bottom */
+.stats-lv-key {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  margin-top: 3px;
+  font-family: var(--font-pixel);
+  font-size: var(--pixel-xs);
+  line-height: 1.1;
+  color: var(--color-text-muted);
+}
+
+.stats-lv-key > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.stats-lv-sw {
+  display: inline-block;
+  flex-shrink: 0;
+  width: 9px;
+  height: 9px;
+  border: 1px solid var(--color-border-strong);
+}
+
+.stats-lv-cell {
+  height: 1px; /* lets the bar fill the row height */
+  padding: 2px 4px;
+  vertical-align: bottom;
+}
+
+.stats-lv-cell.is-thin {
+  opacity: 0.45;
+}
+
+.stats-lv {
+  display: flex;
+  flex-direction: column-reverse;
+  height: 100%;
+  min-height: 40px;
+  overflow: hidden;
+  background: var(--color-surface-alt);
+  border: 2px solid var(--color-border-strong);
+}
+
+.stats-lv__seg {
+  flex-shrink: 1;
+  width: 100%;
+}
+
+.stats-lv__seg + .stats-lv__seg {
+  border-bottom: 2px solid var(--color-surface);
+}
+
+.stats-lv-none {
+  display: block;
+  text-align: center;
+  color: var(--color-text-muted);
+}
+
+/* Ordered levels: lightest = first (poor / low / none), darkest = last (good / high / strong). */
+.stats-seg--0 {
+  background: var(--lilac-soft);
+}
+.stats-seg--1 {
+  background: var(--lilac);
+}
+.stats-seg--2 {
+  background: var(--lilac-deep);
+}
+
+/* ---------- Footer ---------- */
+
+.stats-footer {
+  align-self: center;
+  max-width: 100%;
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--font-size-xs);
+  line-height: 1.1;
+  text-align: center;
+  color: var(--color-text-muted);
+  background: var(--color-surface);
+  border: 2px solid var(--color-border-strong);
+  box-shadow: var(--drop-hard);
+}
+
+/* A mood that was never rated (mood tracking off or at a lower level): one quiet cell. */
+.stats-heat__cell.stats-heat__untracked {
+  font-size: var(--font-size-xs);
+}
