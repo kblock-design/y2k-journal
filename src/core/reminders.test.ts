@@ -81,13 +81,13 @@ describe('alarm-shortcut preference', () => {
 })
 
 describe('eligible dates', () => {
-  it('today and yesterday only', () => {
+  it('today only (the shortcut records the current date)', () => {
     expect(alarmDateEligible('2026-10-06', '2026-10-06')).toBe(true)
-    expect(alarmDateEligible('2026-10-05', '2026-10-06')).toBe(true)
+    expect(alarmDateEligible('2026-10-05', '2026-10-06')).toBe(false)
     expect(alarmDateEligible('2026-10-04', '2026-10-06')).toBe(false)
     expect(alarmDateEligible('2026-10-07', '2026-10-06')).toBe(false)
     // Across a month boundary.
-    expect(alarmDateEligible('2026-09-30', '2026-10-01')).toBe(true)
+    expect(alarmDateEligible('2026-10-01', '2026-10-01')).toBe(true)
   })
 })
 
@@ -179,14 +179,13 @@ describe('after-save prompt', () => {
     expect(c.alarmPrompt).toBeNull()
   })
 
-  it('yesterday counts (late or backfilled entry); older dates and edits don’t', () => {
+  it('only today counts; editing yesterday or older days doesn’t', () => {
     const c = new Controller(afternoon())
     c.logged.add('2026-10-05')
     c.enabled = true
     c.openCheckin('2026-10-05') // editing yesterday
     c.save()
-    expect(c.alarmPrompt).toEqual({ date: '2026-10-05' })
-    c.dismiss()
+    expect(c.alarmPrompt).toBeNull()
     c.openCheckin('2026-10-01')
     c.save()
     expect(c.alarmPrompt).toBeNull()
@@ -218,13 +217,13 @@ describe('after-save prompt', () => {
     expect(c.alarmPrompt).toEqual({ date: '2026-10-06' })
   })
 
-  it('backfill alone (before the reminder time): one prompt, for yesterday', () => {
+  it('backfill alone (before the reminder time): no prompt, tonight is still open', () => {
     const c = new Controller(afternoon())
     c.enabled = true
     expect(c.checkin).toEqual({ date: '2026-10-05', blocking: true })
     c.save()
     expect(c.checkin).toBeNull()
-    expect(c.alarmPrompt).toEqual({ date: '2026-10-05' })
+    expect(c.alarmPrompt).toBeNull()
   })
 
   it('hidden while any check-in is open; navigating or opening a check-in dismisses it', () => {
@@ -259,9 +258,6 @@ describe('after-save prompt', () => {
     d.openCheckin('2026-10-06')
     d.save()
     d.now = new Date(2026, 9, 7, 10, 0)
-    expect(d.alarmPrompt).toEqual({ date: '2026-10-06' }) // yesterday's still fine
-    d.now = new Date(2026, 9, 8, 10, 0)
-    d.logged.add('2026-10-07') // nothing to backfill
-    expect(d.alarmPrompt).toBeNull()
+    expect(d.alarmPrompt).toBeNull() // a new day: the offer has expired
   })
 })

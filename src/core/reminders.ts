@@ -1,4 +1,3 @@
-import { addDays } from '../logic/dates'
 import type { ISODate } from '../types'
 import { createPref, usePref } from './prefs'
 
@@ -73,7 +72,7 @@ export const ALARM_COPY = {
 
 /** Phone setup, in order. Render as a numbered list (the numbers aren't in the text), above the switch. */
 export const REMINDER_SETUP_STEPS: readonly string[] = [
-  `In the Shortcuts app, create a shortcut named exactly “${DONE_SHORTCUT_NAME}”. Add a “Save File” action that saves the Shortcut Input (the date this app passes in) to iCloud Drive › Shortcuts as “phase-done.txt”, with “Overwrite If File Exists” on.`,
+  `In the Shortcuts app, create a shortcut named exactly “${DONE_SHORTCUT_NAME}” with three actions: “Date” (current date), “Format Date” with the custom format yyyy-MM-dd, and “Save File”, which saves that formatted date to iCloud Drive › Shortcuts as “phase-done.txt” with “Overwrite If File Exists” on and “Ask Where to Save” off.`,
   'Create a shortcut “Phase Nudge”: a “Get File” action for Shortcuts/phase-done.txt (“Error If Not Found” off), then an “If” that compares the file’s text with the current date formatted as yyyy-MM-dd. If they differ: “Show Alert” (“Check in with Phase first”) followed by “Go to Home Screen”. If they match: nothing.',
   'In Shortcuts › Automation, add one automation per app you tend to open in the evening (e.g. Instagram, TikTok, Messages): “When [app] is opened”, Run Immediately, run Phase Nudge. Optionally use a Time of Day trigger to switch the automations on at your reminder time.',
   `Turn on the switch below, then tap “${ALARM_COPY.test}” to confirm it opens Shortcuts and saves the file.`,
@@ -86,14 +85,14 @@ export interface AlarmPrompt {
 
 /** True when telling the phone makes sense for a check-in on `date`: today's or yesterday's (a late or backfilled entry). */
 export function alarmDateEligible(date: ISODate, today: ISODate): boolean {
-  return date === today || date === addDays(today, -1)
+  return date === today
 }
 
 /**
  * The date waiting to be offered in the prompt (null = nothing to offer). Pure state machine,
  * used by `useAppController` through `useReducer`.
  * - `saved`: a check-in for `date` was just saved. Remembers it when the switch is on and the
- *   date is today or yesterday, otherwise clears it (so only the last save of a sequence counts).
+ *   date is today, otherwise clears it (so only the last save of a sequence counts).
  * - `dismiss`: "Not now", the shortcut was run, the user navigated or opened another check-in.
  */
 export type AlarmPromptEvent =
