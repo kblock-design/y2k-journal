@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import { hatchPet as dbHatchPet, markPetDead } from '../db'
 import { checkinDue } from '../logic/checkin'
 import type { CheckinDue } from '../logic/checkin'
@@ -6,7 +6,8 @@ import { toISODate } from '../logic/dates'
 import { petStatus as computePetStatus } from '../logic/pet'
 import type { PetStatus } from '../logic/pet'
 import type { DayLog, ISODate, Pet, Settings } from '../types'
-import { openedOutsideHomeScreen } from './reminders'
+import { alarmPromptReducer, alarmShortcutPref, openedOutsideHomeScreen, useAlarmShortcut, visibleAlarmPrompt } from './reminders'
+import type { AlarmPrompt } from './reminders'
 import { activeSkin } from './skin'
 import type { AppData } from './useAppData'
 
@@ -84,12 +85,13 @@ export interface AppController {
 
   // ---- Navigation ----
   tab: Tab
+  /** Switches screen (and dismisses the alarm prompt). */
   setTab: (tab: Tab) => void
 
   // ---- Check-in ----
   /** The check-in to show now, or null. Render its form keyed by `date`. */
   checkin: OpenCheckin | null
-  /** Opens a voluntary check-in for `date` (closable unless a blocking one takes over). */
+  /** Opens a voluntary check-in for `date` (closable unless a blocking one takes over). Dismisses the alarm prompt. */
   openCheckin: (date: ISODate) => void
   /** Closes a voluntary check-in. Does nothing to a blocking one. */
   closeCheckin: () => void
@@ -98,6 +100,18 @@ export interface AppController {
    * blocking backfill moves straight on to today's check-in if that is due too.
    */
   onCheckinSaved: () => Promise<void>
+
+  // ---- Phone reminders (see src/core/reminders.ts) ----
+  /**
+   * Set right after a check-in for today or yesterday is saved, while the per-device switch
+   * "Tell your phone when you've checked in" is on and no check-in is open (after a backfill
+   * followed by today's check-in, only once the last one is saved). Show a small, non-blocking
+   * prompt (`ALARM_COPY.prompt`): `ALARM_COPY.confirm` → `runDoneShortcut(alarmPrompt.date)`
+   * then `dismissAlarmPrompt()`; `ALARM_COPY.notNow` → `dismissAlarmPrompt()`. Cleared by
+   * `setTab` and `openCheckin`.
+   */
+  alarmPrompt: AlarmPrompt | null
+  dismissAlarmPrompt: () => void
 }
 
 function hasCheckinDeepLink(): boolean {
@@ -196,13 +210,31 @@ export function useAppController(data: AppData, reload: () => Promise<void>, opt
     [checkinDate, blockingDate],
   )
 
+  // After a save, maybe offer to tell the phone (run "Phase Done"). Only offered once no
+  // check-in is open, so a backfill followed by today's blocking check-in prompts once, after
+  // the last save, for the last date saved.
+  const alarmShortcut = useAlarmShortcut()
+  const [alarmPending, dispatchAlarm] = useReducer(alarmPromptReducer, null)
+  const dismissAlarmPrompt = useCallback(() => dispatchAlarm({ type: 'dismiss' }), [])
+
   // The form stays in its "saving" state until fresh data is loaded, so the due state is
   // recomputed from the new logs before it closes (or moves on to today's check-in).
+  // `checkinDate` is the date of the form that called this (forms are keyed by date).
   const onCheckinSaved = useCallback(async () => {
+    const savedDate = checkinDate
     await reload()
+    const savedAt = new Date()
     setManualCheckin(null)
-    setNow(new Date())
-  }, [reload])
+    setNow(savedAt)
+    if (savedDate) {
+      dispatchAlarm({ type: 'saved', date: savedDate, today: toISODate(savedAt), enabled: alarmShortcutPref.get() === 'on' })
+    }
+  }, [reload, checkinDate])
+
+  const alarmPrompt = useMemo(
+    () => visibleAlarmPrompt(alarmPending, { checkinOpen: checkin !== null, enabled: alarmShortcut === 'on', today }),
+    [alarmPending, checkin, alarmShortcut, today],
+  )
 
   const hatchPet = useCallback(
     async (name: string) => {
@@ -213,6 +245,15 @@ export function useAppController(data: AppData, reload: () => Promise<void>, opt
   )
 
   const closeCheckin = useCallback(() => setManualCheckin(null), [])
+  // Going anywhere else retires the prompt.
+  const changeTab = useCallback((next: Tab) => {
+    setTab(next)
+    dispatchAlarm({ type: 'dismiss' })
+  }, [])
+  const openCheckin = useCallback((date: ISODate) => {
+    setManualCheckin(date)
+    dispatchAlarm({ type: 'dismiss' })
+  }, [])
   const [outsideHomeScreen] = useState(openedOutsideHomeScreen)
 
   return {
@@ -234,10 +275,12 @@ export function useAppController(data: AppData, reload: () => Promise<void>, opt
     memorialPet: !currentPet && pets.length > 0 ? pets[pets.length - 1] : null,
     hatchPet,
     tab,
-    setTab,
+    setTab: changeTab,
     checkin,
-    openCheckin: setManualCheckin,
+    openCheckin,
     closeCheckin,
     onCheckinSaved,
+    alarmPrompt,
+    dismissAlarmPrompt,
   }
 }

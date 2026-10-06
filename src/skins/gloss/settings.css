@@ -379,6 +379,161 @@
   }
 }
 
+/* Reminders: "How to set up" expander and its numbered steps. */
+
+.gl-expander[aria-expanded='true'] .gl-expander__chev {
+  transform: rotate(180deg);
+}
+
+.gl-setup {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0 16px 14px;
+  padding: 14px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  box-shadow: inset 0 1px 2px rgba(var(--shade-rgb), 0.1);
+}
+
+/* The row after the steps keeps its hairline. */
+.gl-setup + .gl-row::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 66px;
+  right: 0;
+  height: 1px;
+  background: var(--line);
+}
+
+.gl-setup__step {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.gl-setup__num {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--gel);
+  color: var(--on-gel);
+  box-shadow: 0 0 0 1px var(--gel-ring);
+  font-family: var(--font-label);
+  font-size: 12px;
+  font-weight: var(--label-weight);
+  line-height: 1;
+}
+
+.gl-setup__text {
+  min-width: 0;
+  font-size: 14px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 359px) {
+  .gl-setup {
+    margin: 0 10px 12px;
+    padding: 12px 10px;
+  }
+  .gl-setup + .gl-row::before {
+    left: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .gl-expander__chev {
+    transition: transform 0.2s ease;
+  }
+}
+
+/* After-save prompt ("Tell your phone you've checked in?"): a frosted bar floating just above
+   the dock, like the calendar's day bar. Not modal: no backdrop, the page stays usable. */
+
+.gl-alarm {
+  position: fixed;
+  z-index: 28; /* over the calendar's day bar, under the nav */
+  left: 0;
+  right: 0;
+  bottom: calc(var(--nav-bottom) + var(--nav-h) + 10px);
+  width: var(--float-w);
+  max-width: 480px;
+  margin: 0 auto;
+  outline: none;
+}
+
+.gl-alarm__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 22px;
+  background: var(--bar-solid);
+  box-shadow:
+    0 0 0 1px rgba(var(--edge-rgb), 0.08),
+    inset 0 1px 0 var(--hi),
+    0 14px 34px rgba(var(--shade-rgb), 0.2),
+    0 2px 6px rgba(var(--shade-rgb), 0.08);
+}
+
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .gl-alarm__inner {
+    background: var(--bar-glass);
+    -webkit-backdrop-filter: blur(22px) saturate(1.5);
+    backdrop-filter: blur(22px) saturate(1.5);
+  }
+}
+
+.gl-alarm:focus-visible .gl-alarm__inner {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.gl-alarm__icon {
+  flex: none;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--chrome);
+  color: var(--ink);
+  box-shadow:
+    inset 0 0 0 1px rgba(var(--edge-rgb), 0.13),
+    inset 0 1px 0 var(--hi);
+}
+
+.gl-alarm__text {
+  flex: 1;
+  min-width: 0;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.gl-alarm__actions {
+  flex: 1 0 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.gl-alarm__actions > * {
+  flex: 1 1 auto;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .gl-alarm__inner {
+    animation: gl-pop 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+}
+
 /* Import confirmation */
 
 .gl-confirm-layer {

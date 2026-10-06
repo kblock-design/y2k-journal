@@ -1,5 +1,6 @@
-import { useId, useRef } from 'react'
+import { useId, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
+import { ALARM_COPY, alarmShortcutPref, REMINDER_SETUP_STEPS, runDoneShortcut, useAlarmShortcut } from '../../core/reminders'
 import { activeSkin, setSkin, SKINS } from '../../core/skin'
 import { useDialog } from '../../core/useDialog'
 import { MAX_CYCLE, MIN_CYCLE, MOOD_TRACKING_OPTIONS, useSettingsModel } from '../../core/useSettingsModel'
@@ -106,6 +107,8 @@ export function SettingsScreen({ settings, pets, today, onChanged }: Props) {
         <StatusLine status={m.prefsStatus} />
       </Group>
 
+      <Reminders today={today} />
+
       <Group title="Appearance">
         <ColourPicker />
       </Group>
@@ -202,6 +205,80 @@ export function SettingsScreen({ settings, pets, today, onChanged }: Props) {
         <ConfirmImport fileName={m.pendingImport.name} onYes={() => void m.confirmImport()} onNo={m.cancelImport} />
       )}
     </div>
+  )
+}
+
+/**
+ * Reminders: the phone does the nudging (Shortcuts automations); this switch makes the app
+ * offer to run "Phase Done" after each save. Setup steps sit behind a "How to set up" expander.
+ */
+function Reminders({ today }: { today: ISODate }) {
+  const on = useAlarmShortcut() === 'on'
+  const [open, setOpen] = useState(false)
+  const stepsId = useId()
+  const switchTitleId = useId()
+  const switchSubId = useId()
+  return (
+    <Group title={ALARM_COPY.title}>
+      <div className="ph-row ph-row--note">
+        <IconChip icon="bell" tone="green" />
+        <p className="ph-row__main ph-privacy">{ALARM_COPY.intro}</p>
+      </div>
+      <button
+        type="button"
+        className="ph-row ph-row--button ph-expander"
+        aria-expanded={open}
+        aria-controls={stepsId}
+        onClick={() => setOpen((o) => !o)}
+      >
+        <IconChip icon="info" tone="yellow" />
+        <span className="ph-row__main">
+          <span className="ph-row__title">{ALARM_COPY.setup}</span>
+          <span className="ph-row__sub">{REMINDER_SETUP_STEPS.length} steps in the Shortcuts app</span>
+        </span>
+        <Icon name="chevron-right" size={20} className="ph-row__chev ph-expander__chev" />
+      </button>
+      <ol id={stepsId} className="ph-setup" hidden={!open}>
+        {REMINDER_SETUP_STEPS.map((step, i) => (
+          <li key={i} className="ph-setup__step">
+            <span className="ph-setup__num" aria-hidden="true">
+              {i + 1}
+            </span>
+            <span className="ph-setup__text">{step}</span>
+          </li>
+        ))}
+      </ol>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={on}
+        aria-labelledby={switchTitleId}
+        aria-describedby={switchSubId}
+        className="ph-row ph-row--button"
+        onClick={() => alarmShortcutPref.set(on ? 'off' : 'on')}
+      >
+        <IconChip icon="check" tone="blue" />
+        <span className="ph-row__main">
+          <span className="ph-row__title" id={switchTitleId}>
+            {ALARM_COPY.switchLabel}
+          </span>
+          <span className="ph-row__sub" id={switchSubId}>
+            {ALARM_COPY.switchHint}
+          </span>
+        </span>
+        <span className={`ph-switch${on ? ' is-on' : ''}`} aria-hidden="true">
+          <span className="ph-switch__thumb" />
+        </span>
+      </button>
+      <button type="button" className="ph-row ph-row--button" onClick={() => runDoneShortcut(today)}>
+        <IconChip icon="sparkle" tone="pink" />
+        <span className="ph-row__main">
+          <span className="ph-row__title">{ALARM_COPY.test}</span>
+          <span className="ph-row__sub">{ALARM_COPY.testHint}</span>
+        </span>
+        <Icon name="chevron-right" size={20} className="ph-row__chev" />
+      </button>
+    </Group>
   )
 }
 

@@ -1,5 +1,6 @@
-import { useId, useRef } from 'react'
+import { useId, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
+import { ALARM_COPY, alarmShortcutPref, REMINDER_SETUP_STEPS, runDoneShortcut } from '../../core/reminders'
 import { activeSkin, setSkin, SKINS } from '../../core/skin'
 import { useDialog } from '../../core/useDialog'
 import { MAX_CYCLE, MIN_CYCLE, MOOD_TRACKING_OPTIONS, useSettingsModel } from '../../core/useSettingsModel'
@@ -108,6 +109,8 @@ export function SettingsScreen({ settings, pets, today, onChanged }: Props) {
         </div>
         <StatusLine status={m.prefsStatus} />
       </Group>
+
+      <Reminders today={today} />
 
       <Group title="Theme" note="Switching reloads the app. Your entries stay put.">
         {SKINS.map((s) => {
@@ -246,6 +249,49 @@ function PrefSwitch({ pref, icon, title, sub }: { pref: Pref<OnOff>; icon: IconN
         <span className="gl-switch-ctl__thumb" />
       </span>
     </button>
+  )
+}
+
+/**
+ * Reminders: the phone does the nudging (Shortcuts automations); the switch makes the app offer
+ * to run "Phase Done" after each save. Setup steps sit behind a "How to set up" expander.
+ */
+function Reminders({ today }: { today: ISODate }) {
+  const [open, setOpen] = useState(false)
+  const stepsId = useId()
+  return (
+    <Group title={ALARM_COPY.title}>
+      <div className="gl-row gl-row--note">
+        <RowIcon icon="bell" />
+        <p className="gl-row__main gl-privacy">{ALARM_COPY.intro}</p>
+      </div>
+      <button
+        type="button"
+        className="gl-row gl-row--button gl-expander"
+        aria-expanded={open}
+        aria-controls={stepsId}
+        onClick={() => setOpen((o) => !o)}
+      >
+        <RowIcon icon="info" />
+        <span className="gl-row__main">
+          <span className="gl-row__title">{ALARM_COPY.setup}</span>
+          <span className="gl-row__sub">{REMINDER_SETUP_STEPS.length} steps in the Shortcuts app</span>
+        </span>
+        <Icon name="chevron-down" size={20} className="gl-row__chev gl-expander__chev" />
+      </button>
+      <ol id={stepsId} className="gl-setup" hidden={!open}>
+        {REMINDER_SETUP_STEPS.map((step, i) => (
+          <li key={i} className="gl-setup__step">
+            <span className="gl-setup__num" aria-hidden="true">
+              {i + 1}
+            </span>
+            <span className="gl-setup__text">{step}</span>
+          </li>
+        ))}
+      </ol>
+      <PrefSwitch pref={alarmShortcutPref} icon="check" title={ALARM_COPY.switchLabel} sub={ALARM_COPY.switchHint} />
+      <ActionRow icon="clock" title={ALARM_COPY.test} sub={ALARM_COPY.testHint} disabled={false} onClick={() => runDoneShortcut(today)} />
+    </Group>
   )
 }
 

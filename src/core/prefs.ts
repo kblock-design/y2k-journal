@@ -57,7 +57,10 @@ export function createPref<T extends string>(
   }
 }
 
-/** Subscribes a component to a preference; re-renders when it changes. */
+/**
+ * Subscribes a component to a preference; re-renders when it changes. The same getter is the
+ * server snapshot, so static rendering (tests) sees the current value too.
+ */
 export function usePref<T extends string>(pref: Pref<T>): T {
-  return useSyncExternalStore(pref.subscribe, pref.get)
+  return useSyncExternalStore(pref.subscribe, pref.get, pref.get)
 }

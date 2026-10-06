@@ -253,6 +253,11 @@ describe('per-device preference keys (renaming resets the user’s look)', () =>
     expect(read).toEqual(['burn-book:phase-colourway'])
   })
 
+  it('Reminders: the "Phase Done" switch lives in "burn-book:alarm-shortcut"', async () => {
+    await import('../core/reminders')
+    expect(read).toEqual(['burn-book:alarm-shortcut'])
+  })
+
   it('Gloss: pixel labels, colourway', async () => {
     await import('../skins/gloss/prefs')
     expect(read.sort()).toEqual(['burn-book:gloss-colourway', 'burn-book:gloss-pixel-labels'])

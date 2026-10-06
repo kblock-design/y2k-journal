@@ -53,7 +53,20 @@ export { ErrorBoundary } from './ErrorBoundary'
 export { capitalize, emptyLog, errorMessage, formatDay, formatLongDate, formatMonth, PHASE_LABELS, plural } from './format'
 export { dailyFact, dailyQuote } from './daily'
 export type { Quote } from './daily'
-export { openedOutsideHomeScreen } from './reminders'
+export {
+  ALARM_COPY,
+  alarmDateEligible,
+  alarmPromptReducer,
+  alarmShortcutPref,
+  DONE_SHORTCUT_NAME,
+  doneShortcutUrl,
+  openedOutsideHomeScreen,
+  REMINDER_SETUP_STEPS,
+  runDoneShortcut,
+  useAlarmShortcut,
+  visibleAlarmPrompt,
+} from './reminders'
+export type { AlarmPrompt, AlarmPromptEvent, AlarmShortcut } from './reminders'
 export { createPref, usePref } from './prefs'
 export type { Pref } from './prefs'
 export { activeSkin, resetSkin, setSkin, SKINS } from './skin'

@@ -2952,6 +2952,180 @@ button:disabled {
   color: var(--plum-soft);
 }
 
+/* Reminders: numbered setup steps on a white inset panel, an on/off switch row, Test button. */
+.reminders > .win__body {
+  gap: var(--space-3);
+}
+
+.setup-steps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-1);
+  padding: 0 var(--space-3) var(--space-2);
+  list-style: none;
+  background: var(--white);
+  border: 2px solid var(--plum);
+  box-shadow: var(--bevel-in);
+}
+
+.setup-steps__step {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding-top: var(--space-2);
+}
+
+.setup-steps__step + .setup-steps__step {
+  border-top: 2px dotted var(--chrome-300);
+}
+
+.setup-steps__num {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  margin-top: 1px;
+  border: 2px solid var(--ink);
+  background: var(--pink-deep);
+  color: var(--white);
+  font-family: var(--font-pixel);
+  font-size: var(--pixel-sm);
+  line-height: 1;
+  text-shadow: 1px 1px 0 var(--plum);
+}
+
+.setup-steps__text {
+  min-width: 0;
+  font-size: var(--font-size-xs);
+  line-height: 1.2;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+/* The whole row is the switch; the key slides along a bevelled-in track. */
+.switch-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: var(--tap-min);
+  padding: var(--space-2) 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  text-align: left;
+}
+
+.switch-row__text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.switch-row__label {
+  font-family: var(--font-pixel);
+  font-size: var(--pixel-md);
+  line-height: 1.35;
+  color: var(--plum);
+}
+
+.switch {
+  position: relative;
+  flex: none;
+  width: 58px;
+  height: 32px;
+  border: 2px solid var(--ink);
+  background: var(--white);
+  box-shadow: var(--bevel-in);
+}
+
+.switch__key {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--ink);
+  background: var(--chrome-key);
+  box-shadow: var(--bevel-btn);
+}
+
+.switch.is-on {
+  background: linear-gradient(180deg, #b80d68 0%, var(--pink-deep) 45%, #e0208a 100%);
+}
+
+.switch.is-on .switch__key {
+  left: 28px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .switch__key {
+    transition: left 0.12s steps(3, end);
+  }
+}
+
+/* After-save prompt: a small pop-up window docked just above the taskbar. Not modal. */
+.alarm-prompt {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--tabbar-height) + var(--safe-bottom) + 8px);
+  z-index: 11; /* over the calendar's day bar and the taskbar's shadow */
+  width: calc(100% - 16px - var(--safe-left) - var(--safe-right));
+  max-width: calc(var(--app-max-width) - 16px);
+  margin: 0 auto;
+  outline: none;
+}
+
+.alarm-prompt:focus-visible .alarm-prompt__win {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.alarm-prompt__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-3);
+}
+
+.alarm-prompt__text {
+  font-size: var(--font-size-md);
+  line-height: 1.15;
+  color: var(--ink);
+}
+
+.alarm-prompt__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.alarm-prompt__actions > .btn {
+  flex: 1 1 auto;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .alarm-prompt__win {
+    animation: alarm-prompt-pop 0.18s steps(3, end);
+  }
+}
+
+@keyframes alarm-prompt-pop {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 .graveyard__empty {
   color: var(--plum-soft);
   font-size: var(--font-size-md);

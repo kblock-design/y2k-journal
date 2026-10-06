@@ -1,5 +1,6 @@
-import { useRef } from 'react'
+import { useId, useRef } from 'react'
 import type { ChangeEvent, ReactNode } from 'react'
+import { ALARM_COPY, alarmShortcutPref, REMINDER_SETUP_STEPS, runDoneShortcut, useAlarmShortcut } from '../../core/reminders'
 import { activeSkin, setSkin, SKINS } from '../../core/skin'
 import { IMPORT_WARNING, MAX_CYCLE, MIN_CYCLE, MOOD_TRACKING_OPTIONS, useSettingsModel } from '../../core/useSettingsModel'
 import type { ISODate, Pet, Settings } from '../../types'
@@ -107,6 +108,8 @@ export function SettingsScreen({ settings, pets, today, onChanged }: Props) {
         )}
       </Window>
 
+      <Reminders today={today} />
+
       <Window
         tone="black"
         icon="floppy"
@@ -181,6 +184,67 @@ export function SettingsScreen({ settings, pets, today, onChanged }: Props) {
         )}
       </Window>
     </div>
+  )
+}
+
+/**
+ * Reminders: the phone does the nudging (Shortcuts automations); the switch makes the app offer
+ * to run "Phase Done" after each save. The window starts collapsed (its title bar is the
+ * disclosure), so the setup steps don't lengthen Settings.
+ */
+function Reminders({ today }: { today: ISODate }) {
+  const on = useAlarmShortcut() === 'on'
+  const labelId = useId()
+  const hintId = useId()
+  const stepsId = useId()
+  return (
+    <Window
+      tone="chrome"
+      icon="note"
+      title={ALARM_COPY.title}
+      titleAs="h2"
+      className="settings-group reminders"
+      collapsible={{ defaultOpen: false, summary: on ? 'Phase Done on' : 'Off' }}
+    >
+      <p className="privacy-note">{ALARM_COPY.intro}</p>
+      <h3 id={stepsId} className="pick-group__label">
+        {ALARM_COPY.setup}
+      </h3>
+      <ol className="setup-steps" aria-labelledby={stepsId}>
+        {REMINDER_SETUP_STEPS.map((step, i) => (
+          <li key={i} className="setup-steps__step">
+            <span className="setup-steps__num" aria-hidden="true">
+              {i + 1}
+            </span>
+            <span className="setup-steps__text">{step}</span>
+          </li>
+        ))}
+      </ol>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={on}
+        aria-labelledby={labelId}
+        aria-describedby={hintId}
+        className="switch-row"
+        onClick={() => alarmShortcutPref.set(on ? 'off' : 'on')}
+      >
+        <span className="switch-row__text">
+          <span className="switch-row__label" id={labelId}>
+            {ALARM_COPY.switchLabel}
+          </span>
+          <span className="hint" id={hintId}>
+            {ALARM_COPY.switchHint}
+          </span>
+        </span>
+        <span className={`switch${on ? ' is-on' : ''}`} aria-hidden="true">
+          <span className="switch__key" />
+        </span>
+      </button>
+      <button type="button" className="btn btn--secondary btn--block" onClick={() => runDoneShortcut(today)}>
+        {ALARM_COPY.test}
+      </button>
+    </Window>
   )
 }
 

@@ -80,6 +80,9 @@ function Ready({ data, reload }: { data: AppData; reload: () => Promise<void> })
           {/* calendar, stats, settings */}
         </ErrorBoundary>
         <Nav tab={app.tab} onChange={app.setTab} />
+        {app.alarmPrompt && (
+          <AlarmPrompt key={app.alarmPrompt.date} date={app.alarmPrompt.date} onDismiss={app.dismissAlarmPrompt} />
+        )}
       </div>
       {app.checkin && (
         <Checkin key={app.checkin.date} {...app.checkin} today={app.today}
@@ -149,6 +152,22 @@ last-resort unstyled one.
       export JSON + CSV, import with confirmation, status lines (`role="status"`), privacy
       note (data never leaves the device), **skin switcher** (`SKINS`, `activeSkin()`,
       `setSkin(key)`). Pet skins: graveyard (`model.graveyard`).
+- [ ] **Settings › Reminders** (after Check-in; title `ALARM_COPY.title`): `ALARM_COPY.intro`
+      as one line; the setup steps (`REMINDER_SETUP_STEPS`, a numbered `<ol>`, numbers drawn
+      by you) behind a disclosure (`ALARM_COPY.setup` expander with `aria-expanded`, or a
+      collapsed window) and *above* the switch (step 4 says "the switch below"); the switch
+      `ALARM_COPY.switchLabel` (`role="switch"` + `aria-checked`, ≥ 44px, whole row the target;
+      `useAlarmShortcut()` / `alarmShortcutPref.set('on' | 'off')`); a ≥ 44px
+      `ALARM_COPY.test` button → `runDoneShortcut(today)`. Never say "alarm" in copy.
+- [ ] **After-save prompt** while `app.alarmPrompt` is set: a small **non-modal** card
+      (`role="dialog"`, `aria-modal="false"`, labelled by `ALARM_COPY.prompt`) above the
+      navigation and clear of the bottom safe area; render it inside the app container (so it
+      goes inert with a check-in) and never put a backdrop behind it. Primary
+      `ALARM_COPY.confirm` → `runDoneShortcut(app.alarmPrompt.date)` then
+      `app.dismissAlarmPrompt()`; secondary `ALARM_COPY.notNow` → `app.dismissAlarmPrompt()`.
+      Moving focus to it once is fine; trapping it is not. Escape dismisses. It goes away by
+      itself on `setTab` / `openCheckin`. Wrap it in an `ErrorBoundary` whose fallback is
+      `null` (it's optional; a crash must not block the app).
 - [ ] Per-section **error boundaries** (each screen keyed by tab, the check-in, big cards).
 
 ## Core API
@@ -162,8 +181,25 @@ the error boundary of the section that shows them.
 **`useAppController(data, reload, { usesPet? })`** → `AppController` (see doc comments):
 `settings logs pets currentPet reload now today loggedDates due todayLogged noLogsYet
 outsideHomeScreen usesPet needsFirstPet petStatus memorialPet hatchPet tab setTab checkin
-openCheckin closeCheckin onCheckinSaved`. `usesPet` defaults to the registry flag. Handles the
-minute tick, foreground refresh, `?checkin=1` deep link and pet-death persistence.
+openCheckin closeCheckin onCheckinSaved alarmPrompt dismissAlarmPrompt`. `usesPet` defaults to
+the registry flag. Handles the minute tick, foreground refresh, `?checkin=1` deep link and
+pet-death persistence. `alarmPrompt: { date } | null` is set after a check-in for today or
+yesterday is saved while the Phase Done switch is on, only once no check-in is open (a backfill
+followed by today's blocking check-in prompts once, after the last save, for today); `setTab`,
+`openCheckin` and `dismissAlarmPrompt()` clear it, and it lapses once the date is older than
+yesterday.
+
+**Phone reminders** (`src/core/reminders.ts`): iOS Home Screen apps can't notify, so the phone
+nudges (a Shortcuts automation, "Phase Nudge", when evening apps are opened) and the app tells
+it the check-in is done by running the **"Phase Done"** shortcut with the date as text input.
+`DONE_SHORTCUT_NAME`, `doneShortcutUrl(date)` (`shortcuts://run-shortcut?name=Phase%20Done&input=text&text=<date>`),
+`runDoneShortcut(date)` (sets `window.location.href`; call it **only from a tap handler**, never
+from an effect or before a save has finished), `alarmShortcutPref` (`'on' | 'off'`, default off,
+`localStorage['burn-book:alarm-shortcut']`, per device) + `useAlarmShortcut()`,
+`REMINDER_SETUP_STEPS` (string[], render as a numbered list), `ALARM_COPY` (`title intro
+switchLabel switchHint test testHint setup prompt confirm notNow`; use these strings verbatim
+so every skin says the same thing). The pure pieces behind `alarmPrompt` are exported for tests:
+`alarmDateEligible`, `alarmPromptReducer`, `visibleAlarmPrompt`.
 
 **`useCheckinForm(date, app.onCheckinSaved, app.settings.moodTracking)`** → `{ log, previous,
 isEdit, loadError, retryLoad, update(patch), moodTracking, moodItems, setMood(key, rating),
@@ -222,7 +258,9 @@ canSubmit, submit }`, `PET_NAME_MAX`.
 
 **Skins & prefs**: `SKINS`, `activeSkin()`, `setSkin(key)` (saves + reloads), `resetSkin()`.
 `createPref(storageKey, options, fallback, onChange?)` + `usePref(pref)` for a skin's own
-per-device options. Prefix keys `burn-book:<skin>-…`. Never put prefs in the database.
+per-device options (`usePref` has a server snapshot, so static-render tests see the current
+value). Prefix keys `burn-book:<skin>-…`. Never put prefs in the database. Pin every new key in
+`src/db/stability.test.ts`.
 
 ## CSS, fonts and the document
 

@@ -1,7 +1,9 @@
+import { ErrorBoundary as CoreErrorBoundary } from '../../core/ErrorBoundary'
 import { errorMessage } from '../../core/format'
 import { TAB_LABELS, useAppController } from '../../core/useAppController'
 import { useAppData } from '../../core/useAppData'
 import type { AppData } from '../../core/useAppData'
+import { AlarmPrompt } from './AlarmPrompt'
 import { CalendarScreen } from './CalendarScreen'
 import { CheckinModal } from './CheckinModal'
 import { Brand, Desktop } from './Desktop'
@@ -122,6 +124,12 @@ function ReadyApp({ data, reload }: ReadyProps) {
           </ErrorBoundary>
         </main>
         <TabBar tab={tab} onChange={setTab} />
+        {app.alarmPrompt && (
+          // A broken prompt just disappears: it's optional and must never block the app.
+          <CoreErrorBoundary label="Phone prompt" fallback={() => null}>
+            <AlarmPrompt key={app.alarmPrompt.date} date={app.alarmPrompt.date} onDismiss={app.dismissAlarmPrompt} />
+          </CoreErrorBoundary>
+        )}
       </div>
       {checkin && (
         <ErrorBoundary key={checkin.date} label="Check-in" layout="overlay">

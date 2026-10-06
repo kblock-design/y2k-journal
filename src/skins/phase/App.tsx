@@ -5,6 +5,7 @@ import { TAB_LABELS, useAppController } from '../../core/useAppController'
 import type { AppController } from '../../core/useAppController'
 import { useAppData } from '../../core/useAppData'
 import type { AppData } from '../../core/useAppData'
+import { AlarmPrompt } from './AlarmPrompt'
 import { CalendarScreen } from './CalendarScreen'
 import { CheckinSheet, SheetFrame } from './CheckinSheet'
 import { HomeScreen } from './HomeScreen'
@@ -86,6 +87,11 @@ function Ready({ data, reload }: { data: AppData; reload: () => Promise<void> })
           </ErrorBoundary>
         </main>
         <Nav tab={tab} onChange={setTab} todayLogged={app.todayLogged} onCheckin={() => app.openCheckin(today)} />
+        {app.alarmPrompt && (
+          <ErrorBoundary label="Phone prompt" fallback={() => null}>
+            <AlarmPrompt key={app.alarmPrompt.date} date={app.alarmPrompt.date} onDismiss={app.dismissAlarmPrompt} />
+          </ErrorBoundary>
+        )}
       </div>
       {checkin && (
         <ErrorBoundary

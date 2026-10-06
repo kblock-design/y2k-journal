@@ -337,9 +337,11 @@ describe('Gloss display preferences', () => {
     expect(h).toContain('class="gl-stamp"')
   })
 
-  it('settings: one switch (pixel labels) with its current state; no stickers switch', () => {
+  it('settings: one display switch (pixel labels) with its current state; no stickers switch', () => {
     let html = settingsHtml()
-    expect(html.match(/role="switch"/g)).toHaveLength(1)
+    // Two switches on the page: Reminders' Phase Done switch and Appearance's pixel labels.
+    expect(html.match(/role="switch"/g)).toHaveLength(2)
+    expect(html.indexOf('Tell your phone')).toBeLessThan(html.indexOf('Pixel labels'))
     expect(html).not.toContain('Stickers')
     expect(html).toMatch(/role="switch" aria-checked="true"[^>]*>(?:(?!<\/button>).)*Pixel labels/)
     pixelLabelsPref.set('off')
